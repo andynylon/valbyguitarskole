@@ -26,14 +26,14 @@ export const offers: Offer[] = [
   },
   {
     name: { da: "10 lektioner", en: "10 lessons" },
-    price: { da: "2.700 kr.", en: "DKK 2,700" },
+    price: { da: "2.750 kr.", en: "DKK 2,750" },
     text: {
       da: "Til dig, der vil skabe momentum og mærke tydelig udvikling.",
       en: "For players who want to build momentum and make clear progress.",
     },
     note: {
-      da: "10 × 30 min. · Spar 300 kr.",
-      en: "10 × 30 min. · Save DKK 300",
+      da: "10 × 30 min. · Spar 250 kr.",
+      en: "10 × 30 min. · Save DKK 250",
     },
     tone: "coral",
     featured: true,
