@@ -13,5 +13,5 @@ jobs:
       with:
         target-server: ssh.simply.com
         remote-user: valbyguitarskol.dk
-        private-ssh-key: ${{ secrets.SSH_KEY }}
+        private-ssh-key: ${{ secrets.SSH_PRIVATE_VALBYGUITARSKOLE }}
         destination-path: ~/public_html/
