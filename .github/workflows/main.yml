@@ -1,29 +1,34 @@
 name: Publish Website
 
-on: push:
+on:
+  push:
 
 jobs:
   web-deploy:
-    name: 🚀 Build and Deploy Website
+    name: Deploy Website
     runs-on: ubuntu-latest
 
-steps:
-  - name: 🚚 Get Latest Code
-    uses: actions/checkout@v4
-  - name: ⚙️ Setup Node.js
-    uses: actions/setup-node@v4
-    with:
-      node-version: 22
-      cache: npm
-  - name: 📦 Install Dependencies
-    run: npm ci
-  - name: 🏗️ Build Website
-    run: npm run build
-  - name: 📂 Deploy to Simply.com
-    uses: SamKirkland/web-deploy@v1
-    with:
-      target-server: ssh.simply.com
-      remote-user: valbyguitarskol.dk
-      private-ssh-key: ${{ secrets.SSH_PRIVATE_VALBYGUITARSKOLE }}
-      destination-path: ~/public_html/
-      source-path: ./dist/
+    steps:
+      - name: Get Latest Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Website
+        run: npm run build
+
+      - name: Deploy to Simply.com
+        uses: SamKirkland/web-deploy@v1
+        with:
+          target-server: ssh.simply.com
+          remote-user: valbyguitarskol.dk
+          private-ssh-key: ${{ secrets.SSH_PRIVATE_VALBYGUITARSKOLE }}
+          destination-path: ~/public_html/
+          source-path: ./dist/
