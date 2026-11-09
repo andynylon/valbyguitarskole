@@ -1,3 +1,4 @@
+import { useState, type FormEvent } from "react"
 import { useBooking } from "@/context/BookingContext"
 import { useLanguage } from "@/context/LanguageContext"
 import { Arrow } from "@/components/icons/Arrow"
@@ -7,8 +8,39 @@ import "./BookingModal.scss"
 export function BookingModal() {
   const { t } = useLanguage()
   const { selectedOffer, submitted, closeBooking, markSubmitted } = useBooking()
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState(false)
 
   if (!selectedOffer) return null
+
+  async function sendEnquiry(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const form = new FormData(event.currentTarget)
+    setSending(true)
+    setError(false)
+
+    try {
+      const response = await fetch("/api/booking.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          offer: selectedOffer,
+          name: form.get("name"),
+          email: form.get("email"),
+          phone: form.get("phone"),
+          student: form.get("student"),
+          company: form.get("company"),
+        }),
+      })
+      const result = (await response.json()) as { ok?: boolean }
+      if (!response.ok || result.ok !== true) throw new Error("Booking request was not accepted")
+      markSubmitted()
+    } catch {
+      setError(true)
+    } finally {
+      setSending(false)
+    }
+  }
 
   const giftCard = selectedOffer === t("Gavekort", "Gift card")
 
@@ -53,12 +85,13 @@ export function BookingModal() {
                 "Fill in your details and we will contact you to find the right solution. You only pay once a time has been agreed.",
               )}
             </p>
-            <form
-              onSubmit={(event) => {
-                event.preventDefault()
-                markSubmitted()
-              }}
-            >
+            <form onSubmit={sendEnquiry}>
+              <div className="honeypot" aria-hidden="true">
+                <label>
+                  Company
+                  <input name="company" tabIndex={-1} autoComplete="off" />
+                </label>
+              </div>
               <label>
                 {t("Navn", "Name")}
                 <input name="name" autoFocus required placeholder={t("Dit navn", "Your name")} />
@@ -80,7 +113,7 @@ export function BookingModal() {
                 {giftCard
                   ? t("Ønsket beløb", "Desired amount")
                   : t("Hvem skal spille?", "Who will be playing?")}
-                <select name="student" defaultValue="">
+                <select name="student" defaultValue="" required>
                   <option value="" disabled>
                     {t("Vælg her", "Choose here")}
                   </option>
@@ -100,8 +133,19 @@ export function BookingModal() {
                   )}
                 </select>
               </label>
-              <button className="button" type="submit">
-                {t("Send forespørgsel", "Send enquiry")} <Arrow />
+              {error && (
+                <p className="form-error" role="alert">
+                  {t(
+                    "Beskeden kunne ikke sendes. Prøv igen, eller skriv til hej@valbyguitarskole.dk.",
+                    "The message could not be sent. Try again, or write to hej@valbyguitarskole.dk.",
+                  )}
+                </p>
+              )}
+              <button className="button" type="submit" disabled={sending}>
+                {sending
+                  ? t("Sender…", "Sending…")
+                  : t("Send forespørgsel", "Send enquiry")}{" "}
+                {!sending && <Arrow />}
               </button>
             </form>
           </>
