@@ -25,23 +25,16 @@ export const offers: Offer[] = [
     tone: "cream",
   },
   {
-    name: { da: "5 lektioner", en: "5 lessons" },
-    price: { da: "1.400 kr.", en: "DKK 1,400" },
-    text: {
-      da: "Et fokuseret forløb med plads til både fordybelse og udvikling.",
-      en: "A focused course with room for both immersion and development.",
-    },
-    note: { da: "5 × 30 min. · Spar 100 kr.", en: "5 × 30 min. · Save DKK 100" },
-    tone: "yellow",
-  },
-  {
     name: { da: "10 lektioner", en: "10 lessons" },
     price: { da: "2.700 kr.", en: "DKK 2,700" },
     text: {
       da: "Til dig, der vil skabe momentum og mærke tydelig udvikling.",
       en: "For players who want to build momentum and make clear progress.",
     },
-    note: { da: "10 × 30 min. · Spar 300 kr.", en: "10 × 30 min. · Save DKK 300" },
+    note: {
+      da: "10 × 30 min. · Spar 300 kr.",
+      en: "10 × 30 min. · Save DKK 300",
+    },
     tone: "coral",
     featured: true,
   },
