@@ -29,13 +29,24 @@
   }
 
   form {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
 
-    .button {
+    .button,
+    .form-error {
       grid-column: 1 / -1;
+    }
+
+    .button {
       margin-top: 6px;
+
+      &:disabled {
+        opacity: 0.65;
+        cursor: wait;
+        transform: none;
+      }
     }
 
     @include mobile {
@@ -90,6 +101,26 @@
   border: 0;
   font: 300 30px $font-sans;
   color: $forest;
+}
+
+.honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.form-error {
+  margin: 0;
+  color: $coral-deep;
+  font: 13px/1.5 $font-sans;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .modal-intro {
