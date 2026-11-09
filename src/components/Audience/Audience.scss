@@ -1,0 +1,137 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.audience {
+  background: $paper;
+  text-align: center;
+
+  .section-heading {
+    margin-bottom: 74px;
+
+    @include mobile {
+      margin-bottom: 55px;
+    }
+  }
+}
+
+.audience-grid {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid rgb(24 54 47 / 20%);
+
+  article {
+    min-height: 395px;
+    padding: 30px clamp(20px, 3vw, 50px);
+    border-right: 1px solid rgb(24 54 47 / 20%);
+    position: relative;
+
+    &:last-child {
+      border-right: 0;
+    }
+
+    @include tablet {
+      &:nth-child(2) {
+        border-right: 0;
+      }
+    }
+
+    @include mobile {
+      border-right: 0;
+      border-bottom: 1px solid rgb(24 54 47 / 20%);
+      min-height: 340px;
+    }
+  }
+
+  h3 {
+    font-size: 21px;
+    margin: 20px 0 15px;
+  }
+
+  p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: $muted-copy;
+  }
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.number {
+  position: absolute;
+  top: 25px;
+  left: 0;
+  color: $number;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+
+  @include mobile {
+    left: 8px;
+  }
+}
+
+.line-icon {
+  height: 108px;
+  margin: 20px auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $coral-icon;
+  font-family: $font-serif;
+  font-size: 100px;
+  font-weight: 300;
+}
+
+.chord-icon {
+  gap: 7px;
+  transform: rotate(-20deg);
+
+  i {
+    height: 80px;
+    width: 1.5px;
+    background: $coral-icon;
+    position: relative;
+
+    &:nth-child(2) {
+      height: 95px;
+    }
+
+    &:nth-child(3) {
+      height: 70px;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 1.5px solid $coral-icon;
+      border-radius: 50%;
+      bottom: 11px;
+      left: -4px;
+      background: $paper;
+    }
+  }
+}
+
+.wave-icon {
+  transform: rotate(-12deg);
+}
+
+.center-note {
+  margin: 55px 0 0;
+  font: italic 19px $font-serif;
+  color: $muted-soft;
+
+  strong {
+    color: $coral-deep;
+    font-weight: 500;
+  }
+}

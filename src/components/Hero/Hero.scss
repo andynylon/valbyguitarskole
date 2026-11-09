@@ -1,0 +1,148 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.hero {
+  min-height: 690px;
+  display: grid;
+  grid-template-columns: 52% 48%;
+  background: $cream;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    min-height: 0;
+  }
+}
+
+.hero-copy {
+  padding: clamp(68px, 8vw, 116px) 6vw 72px;
+  align-self: center;
+
+  @include tablet {
+    padding: 72px 24px;
+  }
+
+  @include mobile {
+    padding-top: 58px;
+  }
+}
+
+.hero-intro {
+  max-width: 565px;
+  margin: 35px 0 0;
+  font-size: 17px;
+  line-height: 1.65;
+  color: $muted;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-top: 37px;
+
+  @include mobile {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 22px;
+
+    .button {
+      width: 100%;
+    }
+
+    .text-link {
+      justify-content: center;
+    }
+  }
+}
+
+.text-link {
+  color: $forest;
+  font-size: 13px;
+  font-weight: 600;
+  text-underline-offset: 4px;
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.hero-visual {
+  min-height: 690px;
+  position: relative;
+  background: $sun;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  @include tablet {
+    min-height: 560px;
+  }
+
+  @include mobile {
+    min-height: 485px;
+  }
+}
+
+.sun-shape {
+  position: absolute;
+  width: 75%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: $coral-sun;
+  top: 14%;
+  right: -18%;
+}
+
+.photo-frame {
+  width: min(68%, 445px);
+  height: 75%;
+  position: relative;
+  z-index: 1;
+  transform: rotate(2.7deg);
+  padding: 11px;
+  background: $photo-mat;
+  box-shadow: 0 20px 50px rgb(48 42 20 / 20%);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.78) contrast(0.94);
+  }
+
+  @include mobile {
+    width: 74%;
+    height: 78%;
+  }
+}
+
+.photo-credit {
+  position: absolute;
+  bottom: 15px;
+  right: 17px;
+  color: rgb(255 255 255 / 75%);
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  transform: rotate(-2.7deg);
+}
+
+.hand-note {
+  position: absolute;
+  z-index: 2;
+  bottom: 9%;
+  left: 6%;
+  transform: rotate(-8deg);
+  color: $forest;
+  font: 500 italic 20px/1.05 $font-serif;
+
+  span {
+    font-family: $font-sans;
+    font-style: normal;
+    font-size: 40px;
+    display: inline-block;
+    margin-right: 8px;
+  }
+}

@@ -1,0 +1,29 @@
+@use "../../styles/variables" as *;
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: $forest;
+  text-decoration: none;
+  font-size: 13px;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+
+  svg {
+    width: 39px;
+    height: 39px;
+  }
+
+  strong {
+    font-size: 15px;
+  }
+
+  &--on-dark {
+    color: $cream;
+
+    svg path:first-child {
+      fill: $yellow;
+    }
+  }
+}

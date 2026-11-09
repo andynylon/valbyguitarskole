@@ -1,0 +1,180 @@
+@use "variables" as *;
+@use "mixins" as *;
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  line-height: 1.5;
+  scroll-behavior: smooth;
+
+  @include reduced-motion {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  line-height: inherit;
+  background: $cream;
+  color: $ink;
+  font-family: $font-sans;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+img,
+svg {
+  display: block;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  background: transparent;
+  border: 0;
+  margin: 0;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+::selection {
+  background: $yellow;
+  color: $ink;
+}
+
+main {
+  overflow: hidden;
+}
+
+.eyebrow {
+  margin: 0 0 21px;
+  color: $coral-deep;
+  font-size: 11px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.19em;
+  font-weight: 700;
+}
+
+h1,
+h2 {
+  font-size: clamp(62px, 6.8vw, 108px);
+  line-height: 0.86;
+  letter-spacing: -0.065em;
+  font-weight: 600;
+
+  em {
+    font-family: $font-serif;
+    font-weight: 400;
+    color: $coral-deep;
+  }
+}
+
+h1 {
+  @include mobile {
+    font-size: 58px;
+  }
+}
+
+.section {
+  padding: clamp(90px, 10vw, 145px) clamp(24px, 7vw, 108px);
+
+  @include mobile {
+    padding: 82px 24px;
+  }
+}
+
+.section-heading h2 {
+  font-size: clamp(48px, 5.5vw, 80px);
+}
+
+.button {
+  min-height: 52px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: $forest;
+  color: $white;
+  font: 600 13px $font-sans;
+  text-decoration: none;
+  transition:
+    transform 0.2s,
+    background 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    background: $forest-hover;
+  }
+
+  svg {
+    width: 18px;
+  }
+}
+
+.button-small {
+  min-height: 43px;
+  padding: 0 17px;
+}
+
+.button-light {
+  background: $cream;
+  color: $forest;
+
+  &:hover {
+    color: $white;
+  }
+}
+
+.text-link svg,
+.offer-card button svg {
+  width: 18px;
+}

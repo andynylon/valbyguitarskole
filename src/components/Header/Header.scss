@@ -1,0 +1,129 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.site-header {
+  height: 88px;
+  padding: 0 clamp(24px, 5vw, 76px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $cream;
+  position: relative;
+  z-index: 50;
+  border-bottom: 1px solid rgb(24 54 47 / 15%);
+
+  @include tablet {
+    height: 74px;
+  }
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(21px, 2.7vw, 42px);
+
+  > a {
+    color: $ink;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.58;
+    }
+  }
+
+  @include tablet {
+    position: absolute;
+    top: 74px;
+    left: 0;
+    right: 0;
+    padding: 30px 24px;
+    background: $cream;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    transform: translateY(-130%);
+    transition: transform 0.3s;
+    z-index: -1;
+    box-shadow: 0 15px 30px rgb(24 54 47 / 12%);
+
+    &.open {
+      transform: translateY(0);
+    }
+
+    > a {
+      padding: 15px 0;
+      border-bottom: 1px solid rgb(24 54 47 / 14%);
+      font-size: 15px;
+    }
+  }
+}
+
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgb(24 54 47 / 35%);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+
+  button {
+    border: 0;
+    background: transparent;
+    color: rgb(24 54 47 / 40%);
+    padding: 5px 1px;
+    font: inherit;
+    transition: color 0.2s;
+
+    &:hover,
+    &.active {
+      color: $forest;
+    }
+  }
+
+  @include tablet {
+    padding: 18px 0 2px;
+    justify-content: center;
+
+    button {
+      font-size: 12px;
+      padding: 7px;
+    }
+  }
+}
+
+.nav-cta {
+  svg {
+    width: 15px;
+  }
+
+  @include tablet {
+    margin-top: 20px;
+  }
+}
+
+.menu-button {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  span {
+    width: 23px;
+    height: 1.5px;
+    background: $forest;
+    transition: transform 0.2s;
+  }
+
+  @include tablet {
+    display: flex;
+  }
+}

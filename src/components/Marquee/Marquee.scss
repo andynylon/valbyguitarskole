@@ -1,0 +1,45 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.marquee {
+  background: $forest;
+  color: $cream;
+  overflow: hidden;
+  padding: 15px 0;
+  white-space: nowrap;
+
+  span {
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  i {
+    color: $yellow;
+    font-style: normal;
+  }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: scroll 28s linear infinite;
+
+  @include reduced-motion {
+    animation: none;
+  }
+}
+
+.marquee-group {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-right: 28px;
+}
+
+@keyframes scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}

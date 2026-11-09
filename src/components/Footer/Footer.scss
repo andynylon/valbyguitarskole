@@ -1,0 +1,67 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+footer {
+  background: $forest;
+  color: $cream;
+  padding: 68px clamp(24px, 7vw, 108px) 28px;
+  display: grid;
+  grid-template-columns: 2fr repeat(3, 1fr);
+  gap: 50px;
+
+  a {
+    font-size: 12px;
+    line-height: 1.8;
+    color: rgb(245 238 221 / 63%);
+    text-decoration: none;
+    display: block;
+
+    &:hover {
+      color: $cream;
+    }
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.footer-brand {
+  > p {
+    font-size: 12px;
+    line-height: 1.8;
+    color: rgb(245 238 221 / 63%);
+  }
+
+  .logo {
+    margin-bottom: 25px;
+  }
+
+  @include mobile {
+    grid-column: 1 / -1;
+  }
+}
+
+footer div > p:not(.footer-label) {
+  font-size: 12px;
+  line-height: 1.8;
+  color: rgb(245 238 221 / 63%);
+}
+
+.footer-label {
+  margin: 8px 0 16px;
+  color: $yellow;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+}
+
+.copyright {
+  grid-column: 1 / -1;
+  padding-top: 34px;
+  margin: 20px 0 0;
+  border-top: 1px solid rgb(245 238 221 / 15%);
+  font-size: 9px;
+  opacity: 0.4;
+}
