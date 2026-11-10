@@ -1,71 +1,41 @@
 import { studioImage } from "@/data/images"
-import { useLanguage } from "@/context/LanguageContext"
+import { useText } from "@/context/ContentContext"
 import "./About.scss"
 
 export function About() {
-  const { t } = useLanguage()
-
-  const points = [
-    {
-      number: "01",
-      title: t("Fagligt stærkt", "Expert teaching"),
-      text: t(
-        "Højtuddannede musikere med solid undervisningserfaring.",
-        "Highly educated musicians with extensive teaching experience.",
-      ),
-    },
-    {
-      number: "02",
-      title: t("Nærværende", "Attentive"),
-      text: t("Én elev, én underviser, fuldt fokus.", "One student, one teacher, complete focus."),
-    },
-    {
-      number: "03",
-      title: t("Lokalt", "Local"),
-      text: t(
-        "Tæt på Valby Station og byens hverdagsliv.",
-        "Close to Valby Station and the rhythm of local life.",
-      ),
-    },
-  ]
+  const { content, tx } = useText()
+  const about = content.about
 
   return (
     <section className="about section" id="om">
       <div className="about-photo">
         <img
           src={studioImage}
-          alt={t("Hyggeligt musiklokale med guitarer", "Welcoming music room with guitars")}
+          alt={tx(about.imageAlt)}
         />
         <div className="local-badge">
-          {t("Siden", "Since")}
+          {tx(about.since)}
           <br />
-          <strong>2018</strong>
+          <strong>{about.year}</strong>
           <br />
-          {t("i Valby", "in Valby")}
+          {tx(about.place)}
         </div>
       </div>
       <div className="about-copy">
-        <p className="eyebrow">
-          {t("En lokalt forankret guitarskole", "A locally rooted guitar school")}
-        </p>
+        <p className="eyebrow">{tx(about.eyebrow)}</p>
         <h2>
-          {t("Musik vokser bedst", "Music grows best")}
+          {tx(about.titleLine1)}
           <br />
-          <em>{t("i trygge rammer", "in a safe space")}</em>
+          <em>{tx(about.titleLine2)}</em>
         </h2>
-        <p className="about-lead">
-          {t(
-            "Du undervises af erfarne, højtuddannede musikere med stærke kunstneriske og pædagogiske kompetencer. Her er der både plads til spilleglæde og høje ambitioner.",
-            "You will be taught by experienced, highly educated musicians with strong artistic and teaching skills. There is room for both the joy of playing and high ambitions.",
-          )}
-        </p>
+        <p className="about-lead">{tx(about.lead)}</p>
         <div className="about-points">
-          {points.map((point) => (
-            <div key={point.number}>
-              <span>{point.number}</span>
+          {about.points.map((point, index) => (
+            <div key={point.title.da}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
               <p>
-                <strong>{point.title}</strong>
-                {point.text}
+                <strong>{tx(point.title)}</strong>
+                {tx(point.text)}
               </p>
             </div>
           ))}

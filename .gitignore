@@ -1,2 +1,5 @@
 node_modules/
 private/mail-config.php
+private/cms-config.php
+private/content.json
+public/api/default-content.json

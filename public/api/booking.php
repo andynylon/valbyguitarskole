@@ -34,6 +34,7 @@ $name = field($payload, 'name', 200);
 $email = field($payload, 'email', 200);
 $phone = field($payload, 'phone', 50);
 $student = field($payload, 'student', 200);
+$language = field($payload, 'language', 2) === 'en' ? 'en' : 'da';
 
 if ($offer === '' || $name === '' || $phone === '' || $student === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
@@ -60,12 +61,67 @@ $body = implode("\n", [
 ]);
 
 try {
-    smtpSend($config, $subject, $body, $email);
+    $from = (string) $config['from'];
+    $school = (string) $config['to'];
+    $socket = smtpConnect($config);
+    try {
+        smtpDeliver($socket, $from, $school, $email, $subject, $body, false);
+        try {
+            [$replySubject, $replyBody] = autoReply($name, $offer, $language);
+            smtpDeliver($socket, $from, $email, $from, $replySubject, $replyBody, true);
+        } catch (Throwable $error) {
+            error_log('Booking auto-reply failed: ' . $error->getMessage());
+        }
+        try {
+            smtpCommand($socket, 'QUIT', 221);
+        } catch (Throwable $error) {
+            error_log('SMTP quit failed: ' . $error->getMessage());
+        }
+    } finally {
+        fclose($socket);
+    }
     echo json_encode(['ok' => true]);
 } catch (Throwable $error) {
     error_log('Booking mail failed: ' . $error->getMessage());
     http_response_code(500);
     echo json_encode(['ok' => false]);
+}
+
+function autoReply(string $name, string $offer, string $language): array
+{
+    if ($language === 'en') {
+        return [
+            'We have received your enquiry',
+            implode("\n", [
+                'Hi ' . $name . ',',
+                '',
+                'Thank you for your message. We have received your enquiry about ' . $offer . ' and will get back to you as soon as we can, within one working day.',
+                '',
+                'We look forward to playing with you.',
+                '',
+                'Kind regards',
+                'Valby Guitarskole',
+                'hej@valbyguitarskole.dk',
+                '+45 26 32 18 40',
+            ]),
+        ];
+    }
+
+    return [
+        'Vi har modtaget din forespørgsel',
+        implode("\n", [
+            'Hej ' . $name . ',',
+            '',
+            'Tak for din besked. Vi har modtaget din forespørgsel om ' . $offer . ' og vender tilbage hurtigst muligt, senest inden for én hverdag.',
+            '',
+            'Vi glæder os til at spille med dig.',
+            '',
+            'Venlig hilsen',
+            'Valby Guitarskole',
+            'hej@valbyguitarskole.dk',
+            '+45 26 32 18 40',
+        ]),
+    ];
 }
 
 function field(array $payload, string $key, int $max): string
@@ -78,13 +134,10 @@ function field(array $payload, string $key, int $max): string
     return $value;
 }
 
-function smtpSend(array $config, string $subject, string $body, string $replyTo): void
+function smtpConnect(array $config)
 {
     $host = (string) ($config['host'] ?? 'websmtp.simply.com');
     $port = (int) ($config['port'] ?? 587);
-    $from = (string) $config['from'];
-    $to = (string) $config['to'];
-
     $context = stream_context_create([
         'ssl' => [
             'verify_peer' => true,
@@ -120,27 +173,35 @@ function smtpSend(array $config, string $subject, string $body, string $replyTo)
     smtpCommand($socket, 'AUTH LOGIN', 334);
     smtpCommand($socket, base64_encode((string) $config['username']), 334);
     smtpCommand($socket, base64_encode((string) $config['password']), 235);
+
+    return $socket;
+}
+
+function smtpDeliver($socket, string $from, string $to, string $replyTo, string $subject, string $body, bool $autoReply): void
+{
     smtpCommand($socket, 'MAIL FROM:<' . $from . '>', 250);
     smtpCommand($socket, 'RCPT TO:<' . $to . '>', 250);
     smtpCommand($socket, 'DATA', 354);
 
-    $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-    $message = implode("\r\n", [
+    $headers = [
         'From: Valby Guitarskole <' . $from . '>',
         'To: <' . $to . '>',
         'Reply-To: <' . $replyTo . '>',
-        'Subject: ' . $encodedSubject,
+        'Subject: =?UTF-8?B?' . base64_encode($subject) . '?=',
         'MIME-Version: 1.0',
         'Content-Type: text/plain; charset=UTF-8',
         'Content-Transfer-Encoding: base64',
-        '',
-        trim(chunk_split(base64_encode($body), 76, "\r\n")),
-    ]);
+    ];
+    if ($autoReply) {
+        $headers[] = 'Auto-Submitted: auto-replied';
+    }
+    $headers[] = '';
+    $headers[] = trim(chunk_split(base64_encode($body), 76, "\r\n"));
+
+    $message = implode("\r\n", $headers);
     $message = preg_replace('/^\./m', '..', $message) ?? $message;
     fwrite($socket, $message . "\r\n.\r\n");
     smtpExpect($socket, 250);
-    smtpCommand($socket, 'QUIT', 221);
-    fclose($socket);
 }
 
 function smtpCommand($socket, string $command, int $expected): void

@@ -6,7 +6,7 @@ import { Check } from "@/components/icons/Check"
 import "./BookingModal.scss"
 
 export function BookingModal() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const { selectedOffer, submitted, closeBooking, markSubmitted } = useBooking()
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(false)
@@ -25,6 +25,7 @@ export function BookingModal() {
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           offer: selectedOffer,
+          language,
           name: form.get("name"),
           email: form.get("email"),
           phone: form.get("phone"),

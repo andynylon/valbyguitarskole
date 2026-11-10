@@ -1,0 +1,223 @@
+{
+  "updated": "2026-11-10T00:00:00Z",
+  "meta": {
+    "title": {
+      "da": "Valby Guitarskole — Find din lyd",
+      "en": "Valby Guitar School — Find your sound"
+    },
+    "description": {
+      "da": "Nærværende guitarundervisning i Valby for børn, unge og voksne. Book en prøvetime, et klippekort eller et halvt års undervisning.",
+      "en": "Personal guitar lessons in Valby for children, young people and adults — from beginners to professional players."
+    }
+  },
+  "nav": {
+    "lessons": { "da": "Undervisning", "en": "Lessons" },
+    "pricing": { "da": "Priser", "en": "Pricing" },
+    "about": { "da": "Om skolen", "en": "About" },
+    "contact": { "da": "Kontakt", "en": "Contact" },
+    "book": { "da": "Book en prøvetime", "en": "Book a trial lesson" }
+  },
+  "hero": {
+    "eyebrow": {
+      "da": "Guitarundervisning midt i Valby",
+      "en": "Guitar lessons in the heart of Valby"
+    },
+    "titleLine1": { "da": "Find din lyd.", "en": "Find your sound." },
+    "titleLine2": { "da": "I dit tempo.", "en": "At your pace." },
+    "intro": {
+      "da": "Personlig guitarundervisning for børn, unge og voksne — uanset om du skal lære din første akkord eller finpudse dit spil på højt niveau.",
+      "en": "Personal guitar lessons for children, young people and adults — whether you are learning your first chord or refining your playing at an advanced level."
+    },
+    "book": { "da": "Book en prøvetime", "en": "Book a trial lesson" },
+    "prices": { "da": "Se priser og forløb", "en": "See prices and courses" },
+    "imageAlt": {
+      "da": "Guitarist spiller akustisk guitar i naturligt lys",
+      "en": "Guitarist playing an acoustic guitar in natural light"
+    },
+    "photoCredit": {
+      "da": "Foto: Gabriel Gurrola / Unsplash",
+      "en": "Photo: Gabriel Gurrola / Unsplash"
+    },
+    "noteLine1": { "da": "Her starter", "en": "Music starts" },
+    "noteLine2": { "da": "musikken", "en": "here" }
+  },
+  "marquee": {
+    "label": { "da": "Undervisning for alle niveauer", "en": "Lessons for all levels" },
+    "items": [
+      { "da": "Akustisk", "en": "Acoustic" },
+      { "da": "Elektrisk", "en": "Electric" },
+      { "da": "Begynder", "en": "Beginner" },
+      { "da": "Øvet", "en": "Advanced" },
+      { "da": "Professionel", "en": "Professional" },
+      { "da": "Børn & voksne", "en": "Children & adults" }
+    ]
+  },
+  "audience": {
+    "eyebrow": {
+      "da": "Plads til alle slags guitarister",
+      "en": "Room for every kind of guitarist"
+    },
+    "titleLine1": { "da": "Undervisning, der", "en": "Lessons made" },
+    "titleLine2": { "da": "passer til dig", "en": "for you" },
+    "noteBefore": {
+      "da": "Ingen standardplaner. Vi starter med den musik, ",
+      "en": "No standard plans. We begin with the music "
+    },
+    "noteStrong": { "da": "du", "en": "you" },
+    "noteAfter": { "da": " holder af.", "en": " love." },
+    "groups": [
+      {
+        "title": { "da": "Begyndere", "en": "Beginners" },
+        "text": {
+          "da": "Vi tager det helt fra bunden. Du lærer akkorder, rytme og dine første sange — uden unødigt teori-tungt stof.",
+          "en": "We start with the fundamentals. Learn chords, rhythm and your first songs — without unnecessary, theory-heavy material."
+        }
+      },
+      {
+        "title": { "da": "Øvede", "en": "Advanced players" },
+        "text": {
+          "da": "Få nye værktøjer, bryd gamle vaner og få din teknik og musikalitet til at hænge bedre sammen.",
+          "en": "Gain new tools, break old habits and bring your technique and musicality together."
+        }
+      },
+      {
+        "title": { "da": "Erfarne & professionelle", "en": "Experienced & professional" },
+        "text": {
+          "da": "Fordyb dig i avanceret teknik, improvisation, klang og musikalsk fortolkning med kvalificeret sparring.",
+          "en": "Explore advanced technique, improvisation, tone and musical interpretation with expert guidance."
+        }
+      },
+      {
+        "title": { "da": "Børn & unge", "en": "Children & young people" },
+        "text": {
+          "da": "Legende undervisning med hurtige succesoplevelser, favoritnumre og plads til både nysgerrighed og ambitioner.",
+          "en": "Playful lessons with early wins, favourite songs and room for both curiosity and ambition."
+        }
+      }
+    ]
+  },
+  "pricing": {
+    "eyebrow": { "da": "Vælg dit forløb", "en": "Choose your course" },
+    "titleLine1": { "da": "En god start.", "en": "A great start." },
+    "titleLine2": { "da": "På dine vilkår.", "en": "On your terms." },
+    "intro": {
+      "da": "Alle forløb er 1:1-undervisning og tilpasses dit niveau, din musiksmag og det, du gerne vil kunne. Alle priser er for lektioner på 30 minutter.",
+      "en": "Every course is taught one-to-one and tailored to your level, musical taste and goals. All prices are for 30-minute lessons."
+    },
+    "popular": { "da": "Mest valgt", "en": "Most popular" },
+    "choose": { "da": "Vælg", "en": "Choose" },
+    "offers": [
+      {
+        "name": { "da": "Prøvetime", "en": "Trial lesson" },
+        "price": { "da": "300 kr.", "en": "DKK 300" },
+        "text": {
+          "da": "Mærk efter, om undervisningen og kemien passer til dig.",
+          "en": "See whether the teaching style and personal chemistry feel right."
+        },
+        "note": { "da": "30 min. · Ingen binding", "en": "30 min. · No commitment" },
+        "tone": "cream"
+      },
+      {
+        "name": { "da": "10 lektioner", "en": "10 lessons" },
+        "price": { "da": "2.750 kr.", "en": "DKK 2,750" },
+        "text": {
+          "da": "Til dig, der vil skabe momentum og mærke tydelig udvikling.",
+          "en": "For players who want to build momentum and make clear progress."
+        },
+        "note": { "da": "10 × 30 min. · Spar 250 kr.", "en": "10 × 30 min. · Save DKK 250" },
+        "tone": "coral",
+        "featured": true
+      },
+      {
+        "name": { "da": "Halvt år", "en": "Six months" },
+        "price": { "da": "5.100 kr.", "en": "DKK 5,100" },
+        "text": {
+          "da": "Fast ugentlig tid og et personligt forløb gennem hele sæsonen.",
+          "en": "A fixed weekly time and a personal course throughout the season."
+        },
+        "note": {
+          "da": "20 × 30 min. · 850 kr./md. i 6 mdr.",
+          "en": "20 × 30 min. · DKK 850/month for 6 months"
+        },
+        "tone": "green"
+      }
+    ]
+  },
+  "gift": {
+    "eyebrow": { "da": "Giv musik i gave", "en": "Give the gift of music" },
+    "title": {
+      "da": "Et gavekort, der bliver ved med at spille",
+      "en": "A gift card that keeps on playing"
+    },
+    "text": {
+      "da": "Vælg selv beløbet, og få et flot digitalt gavekort klar til at give videre.",
+      "en": "Choose the amount and receive a beautiful digital gift card, ready to give."
+    },
+    "button": { "da": "Køb gavekort", "en": "Buy a gift card" },
+    "bookingName": { "da": "Gavekort", "en": "Gift card" }
+  },
+  "about": {
+    "imageAlt": {
+      "da": "Hyggeligt musiklokale med guitarer",
+      "en": "Welcoming music room with guitars"
+    },
+    "since": { "da": "Siden", "en": "Since" },
+    "year": "2018",
+    "place": { "da": "i Valby", "en": "in Valby" },
+    "eyebrow": {
+      "da": "En lokalt forankret guitarskole",
+      "en": "A locally rooted guitar school"
+    },
+    "titleLine1": { "da": "Musik vokser bedst", "en": "Music grows best" },
+    "titleLine2": { "da": "i trygge rammer", "en": "in a safe space" },
+    "lead": {
+      "da": "Du undervises af erfarne, højtuddannede musikere med stærke kunstneriske og pædagogiske kompetencer. Her er der både plads til spilleglæde og høje ambitioner.",
+      "en": "You will be taught by experienced, highly educated musicians with strong artistic and teaching skills. There is room for both the joy of playing and high ambitions."
+    },
+    "points": [
+      {
+        "title": { "da": "Fagligt stærkt", "en": "Expert teaching" },
+        "text": {
+          "da": "Højtuddannede musikere med solid undervisningserfaring.",
+          "en": "Highly educated musicians with extensive teaching experience."
+        }
+      },
+      {
+        "title": { "da": "Nærværende", "en": "Attentive" },
+        "text": {
+          "da": "Én elev, én underviser, fuldt fokus.",
+          "en": "One student, one teacher, complete focus."
+        }
+      },
+      {
+        "title": { "da": "Lokalt", "en": "Local" },
+        "text": {
+          "da": "Tæt på Valby Station og byens hverdagsliv.",
+          "en": "Close to Valby Station and the rhythm of local life."
+        }
+      }
+    ]
+  },
+  "contact": {
+    "eyebrow": { "da": "Klar til næste skridt?", "en": "Ready for the next step?" },
+    "titleLine1": { "da": "Kom forbi.", "en": "Come by." },
+    "titleLine2": { "da": "Prøv det af.", "en": "Give it a try." },
+    "text": {
+      "da": "En prøvetime på 30 minutter koster 300 kr. og kræver ingen binding. Vi finder sammen en tid, der passer.",
+      "en": "A 30-minute trial lesson costs DKK 300 with no commitment. Together, we will find a time that works."
+    },
+    "button": { "da": "Book din prøvetime", "en": "Book your trial lesson" },
+    "bookingName": { "da": "Prøvetime", "en": "Trial lesson" }
+  },
+  "footer": {
+    "tagline1": { "da": "Nærværende guitarundervisning", "en": "Personal guitar lessons" },
+    "tagline2": { "da": "for hele Valby.", "en": "for all of Valby." },
+    "findUs": { "da": "Find os", "en": "Find us" },
+    "address1": "Valby Langgade 142",
+    "address2": "2500 Valby",
+    "contact": { "da": "Kontakt", "en": "Contact" },
+    "email": "hej@valbyguitarskole.dk",
+    "phone": "+45 26 32 18 40",
+    "follow": { "da": "Følg med", "en": "Follow us" }
+  }
+}

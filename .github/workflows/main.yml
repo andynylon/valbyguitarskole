@@ -2,6 +2,12 @@ name: Publish Website
 
 on:
   push:
+  repository_dispatch:
+    types: [content_updated]
+
+concurrency:
+  group: deploy-website
+  cancel-in-progress: false
 
 jobs:
   web-deploy:
@@ -28,6 +34,8 @@ jobs:
 
       - name: Build Website
         run: pnpm run build
+        env:
+          CONTENT_URL: https://valbyguitarskole.dk/api/content.php
 
       - name: Deploy to Simply.com
         uses: SamKirkland/web-deploy@v1
