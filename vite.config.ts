@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => {
       minify: !emitSourcemaps,
     },
     plugins: [
+      ssrStyleStub(),
 react(),
       figmaSiteConfiguration(siteConfiguration),
       figmaErrorOverlayReplay(),
@@ -46,6 +47,22 @@ react(),
     },
   }
 })
+
+function ssrStyleStub(): Plugin {
+  return {
+    name: 'ssr-style-stub',
+    enforce: 'pre',
+    apply: 'build',
+    resolveId(id, _importer, options) {
+      if (!options?.ssr || !/\.(scss|sass|css)(\?|$)/.test(id)) return null
+      return '\0ssr-style'
+    },
+    load(id) {
+      if (id !== '\0ssr-style') return null
+      return 'export default ""'
+    },
+  }
+}
 
 type FigmaSiteConfiguration = {
   title?: string

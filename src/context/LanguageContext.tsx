@@ -17,24 +17,21 @@ type LanguageContextValue = {
 const LanguageContext = createContext<LanguageContextValue | null>(null)
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>(() =>
-    localStorage.getItem("valby-language") === "en" ? "en" : "da",
-  )
+  const [language, setLanguage] = useState<Language>("da")
+  const [storedLanguageLoaded, setStoredLanguageLoaded] = useState(false)
 
   useEffect(() => {
-    const english = language === "en"
+    const saved = localStorage.getItem("valby-language")
+    if (saved === "en") setLanguage("en")
+    setStoredLanguageLoaded(true)
+  }, [])
+
+  useEffect(() => {
+    if (!storedLanguageLoaded) return
+
     document.documentElement.lang = language
     localStorage.setItem("valby-language", language)
-    document.title = english
-      ? "Valby Guitar School — Find your sound"
-      : "Valby Guitarskole — Find din lyd"
-    document.querySelector('meta[name="description"]')?.setAttribute(
-      "content",
-      english
-        ? "Personal guitar lessons in Valby for children, young people and adults — from beginners to professional players."
-        : "Nærværende guitarundervisning i Valby for børn, unge og voksne. Book en prøvetime, et klippekort eller et halvt års undervisning.",
-    )
-  }, [language])
+  }, [language, storedLanguageLoaded])
 
   const value = useMemo<LanguageContextValue>(
     () => ({

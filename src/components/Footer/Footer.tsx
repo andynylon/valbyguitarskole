@@ -1,35 +1,37 @@
-import { useLanguage } from "@/context/LanguageContext"
+import { useText } from "@/context/ContentContext"
 import { Logo } from "@/components/Logo/Logo"
 import "./Footer.scss"
 
 export function Footer() {
-  const { t } = useLanguage()
+  const { content, tx } = useText()
+  const footer = content.footer
+  const phoneHref = `tel:${footer.phone.replace(/[^\d+]/g, "")}`
 
   return (
     <footer>
       <div className="footer-brand">
         <Logo onDark />
         <p>
-          {t("Nærværende guitarundervisning", "Personal guitar lessons")}
+          {tx(footer.tagline1)}
           <br />
-          {t("for hele Valby.", "for all of Valby.")}
+          {tx(footer.tagline2)}
         </p>
       </div>
       <div>
-        <p className="footer-label">{t("Find os", "Find us")}</p>
+        <p className="footer-label">{tx(footer.findUs)}</p>
         <p>
-          Valby Langgade 142
+          {footer.address1}
           <br />
-          2500 Valby
+          {footer.address2}
         </p>
       </div>
       <div>
-        <p className="footer-label">{t("Kontakt", "Contact")}</p>
-        <a href="mailto:hej@valbyguitarskole.dk">hej@valbyguitarskole.dk</a>
-        <a href="tel:+4526321840">+45 26 32 18 40</a>
+        <p className="footer-label">{tx(footer.contact)}</p>
+        <a href={`mailto:${footer.email}`}>{footer.email}</a>
+        <a href={phoneHref}>{footer.phone}</a>
       </div>
       <div>
-        <p className="footer-label">{t("Følg med", "Follow us")}</p>
+        <p className="footer-label">{tx(footer.follow)}</p>
         <a href="#instagram">Instagram</a>
         <a href="#facebook">Facebook</a>
       </div>

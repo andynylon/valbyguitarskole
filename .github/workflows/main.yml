@@ -1,17 +1,47 @@
-on: push
 name: Publish Website
+
+on:
+  push:
+  repository_dispatch:
+    types: [content_updated]
+
+concurrency:
+  group: deploy-website
+  cancel-in-progress: false
+
 jobs:
   web-deploy:
-    name: 🚀 Deploy Website Every Commit
+    name: Deploy Website
     runs-on: ubuntu-latest
+
     steps:
-    - name: 🚚 Get Latest Code
-      uses: actions/checkout@v3
-    
-    - name: 📂 Sync Files
-      uses: SamKirkland/web-deploy@v1
-      with:
-        target-server: ssh.simply.com
-        remote-user: valbyguitarskol.dk
-        private-ssh-key: ${{ secrets.SSH_PRIVATE_VALBYGUITARSKOLE }}
-        destination-path: ~/public_html/
+      - name: Get Latest Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Website
+        run: pnpm run build
+        env:
+          CONTENT_URL: https://valbyguitarskole.dk/api/content.php
+
+      - name: Deploy to Simply.com
+        uses: SamKirkland/web-deploy@v1
+        with:
+          target-server: ssh.simply.com
+          remote-user: valbyguitarskol.dk
+          private-ssh-key: ${{ secrets.SSH_PRIVATE_VALBYGUITARSKOLE }}
+          destination-path: ~/public_html/
+          source-path: ./dist/

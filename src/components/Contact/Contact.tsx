@@ -1,34 +1,30 @@
 import { useBooking } from "@/context/BookingContext"
-import { useLanguage } from "@/context/LanguageContext"
+import { useText } from "@/context/ContentContext"
 import { Arrow } from "@/components/icons/Arrow"
 import "./Contact.scss"
 
 export function Contact() {
-  const { t } = useLanguage()
+  const { content, tx } = useText()
   const { openBooking } = useBooking()
+  const contact = content.contact
 
   return (
     <section className="contact section" id="kontakt">
       <div>
-        <p className="eyebrow">{t("Klar til næste skridt?", "Ready for the next step?")}</p>
+        <p className="eyebrow">{tx(contact.eyebrow)}</p>
         <h2>
-          {t("Kom forbi.", "Come by.")}
+          {tx(contact.titleLine1)}
           <br />
-          <em>{t("Prøv det af.", "Give it a try.")}</em>
+          <em>{tx(contact.titleLine2)}</em>
         </h2>
       </div>
       <div className="contact-side">
-        <p>
-          {t(
-            "En prøvetime på 30 minutter koster 300 kr. og kræver ingen binding. Vi finder sammen en tid, der passer.",
-            "A 30-minute trial lesson costs DKK 300 with no commitment. Together, we will find a time that works.",
-          )}
-        </p>
+        <p>{tx(contact.text)}</p>
         <button
           className="button button-light"
-          onClick={() => openBooking(t("Prøvetime", "Trial lesson"))}
+          onClick={() => openBooking(tx(contact.bookingName))}
         >
-          {t("Book din prøvetime", "Book your trial lesson")} <Arrow />
+          {tx(contact.button)} <Arrow />
         </button>
       </div>
     </section>

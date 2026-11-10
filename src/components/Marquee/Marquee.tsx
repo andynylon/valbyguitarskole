@@ -1,22 +1,15 @@
 import { Fragment } from "react"
-import { useLanguage } from "@/context/LanguageContext"
+import { useText } from "@/context/ContentContext"
 import "./Marquee.scss"
 
 export function Marquee() {
-  const { t } = useLanguage()
-  const items = [
-    t("Akustisk", "Acoustic"),
-    t("Elektrisk", "Electric"),
-    t("Begynder", "Beginner"),
-    t("Øvet", "Advanced"),
-    t("Professionel", "Professional"),
-    t("Børn & voksne", "Children & adults"),
-  ]
+  const { content, tx } = useText()
+  const items = content.marquee.items.map((item) => tx(item))
 
   return (
     <div
       className="marquee"
-      aria-label={t("Undervisning for alle niveauer", "Lessons for all levels")}
+      aria-label={tx(content.marquee.label)}
     >
       <div className="marquee-track">
         {[0, 1].map((group) => (

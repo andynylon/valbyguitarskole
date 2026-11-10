@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useBooking } from "@/context/BookingContext"
+import { useText } from "@/context/ContentContext"
 import { useLanguage } from "@/context/LanguageContext"
 import { Arrow } from "@/components/icons/Arrow"
 import { Logo } from "@/components/Logo/Logo"
@@ -7,15 +8,16 @@ import "./Header.scss"
 
 export function Header() {
   const { language, setLanguage, t } = useLanguage()
+  const { content, tx } = useText()
   const { openBooking } = useBooking()
   const [menuOpen, setMenuOpen] = useState(false)
   const english = language === "en"
 
   const links = [
-    { href: "#undervisning", label: t("Undervisning", "Lessons") },
-    { href: "#priser", label: t("Priser", "Pricing") },
-    { href: "#om", label: t("Om skolen", "About") },
-    { href: "#kontakt", label: t("Kontakt", "Contact") },
+    { href: "#undervisning", label: tx(content.nav.lessons) },
+    { href: "#priser", label: tx(content.nav.pricing) },
+    { href: "#om", label: tx(content.nav.about) },
+    { href: "#kontakt", label: tx(content.nav.contact) },
   ]
 
   const closeMenu = () => setMenuOpen(false)
@@ -52,11 +54,11 @@ export function Header() {
         <button
           className="button button-small nav-cta"
           onClick={() => {
-            openBooking(t("Prøvetime", "Trial lesson"))
+            openBooking(tx(content.contact.bookingName))
             closeMenu()
           }}
         >
-          {t("Book en prøvetime", "Book a trial lesson")} <Arrow />
+          {tx(content.nav.book)} <Arrow />
         </button>
       </nav>
       <button
