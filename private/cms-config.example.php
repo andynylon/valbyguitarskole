@@ -12,4 +12,9 @@ return [
     'password' => 'choose-a-long-password',
     'github_token' => '',
     'github_repository' => 'andynylon/valbyguitarskole',
+    // Shown in the gift-card payment email. Leave blank until the numbers are ready.
+    'mobilepay' => '',
+    'bank_reg' => '',
+    'bank_account' => '',
+    'account_name' => 'Valby Guitarskole',
 ];

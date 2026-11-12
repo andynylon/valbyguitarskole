@@ -46,12 +46,20 @@ function content_write(array $data): void
 
 function content_config(): ?array
 {
+    static $loaded = false;
+    static $config = null;
+    if ($loaded) {
+        return $config;
+    }
+    $loaded = true;
+
     if (!is_file(content_config_path())) {
         return null;
     }
-    $config = require content_config_path();
+    $file = require content_config_path();
+    $config = is_array($file) ? $file : null;
 
-    return is_array($config) ? $config : null;
+    return $config;
 }
 
 function content_trigger_rebuild(array $config): ?string

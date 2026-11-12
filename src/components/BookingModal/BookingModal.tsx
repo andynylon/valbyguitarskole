@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react"
+import { useEffect, useState, type FormEvent } from "react"
 import { useBooking } from "@/context/BookingContext"
 import { useLanguage } from "@/context/LanguageContext"
 import { Arrow } from "@/components/icons/Arrow"
@@ -10,14 +10,35 @@ export function BookingModal() {
   const { selectedOffer, submitted, closeBooking, markSubmitted } = useBooking()
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(false)
+  const [studentChoice, setStudentChoice] = useState("")
+
+  useEffect(() => {
+    setStudentChoice("")
+    setError(false)
+  }, [selectedOffer])
 
   if (!selectedOffer) return null
+
+  const giftCard = selectedOffer === t("Gavekort", "Gift card")
 
   async function sendEnquiry(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
     setSending(true)
     setError(false)
+
+    let student = String(form.get("student") ?? "")
+    if (giftCard && student === "other") {
+      const amount = Number(String(form.get("amount") ?? "").replace(",", "."))
+      if (!Number.isFinite(amount) || amount < 1 || amount > 100000) {
+        setSending(false)
+        setError(true)
+        return
+      }
+      const rounded = Math.round(amount)
+      const formatted = new Intl.NumberFormat(language === "en" ? "en-GB" : "da-DK").format(rounded)
+      student = language === "en" ? `DKK ${formatted}` : `${formatted} kr.`
+    }
 
     try {
       const response = await fetch("/api/booking.php", {
@@ -29,7 +50,9 @@ export function BookingModal() {
           name: form.get("name"),
           email: form.get("email"),
           phone: form.get("phone"),
-          student: form.get("student"),
+          student,
+          recipient: giftCard ? form.get("recipient") : "",
+          greeting: giftCard ? form.get("greeting") : "",
           company: form.get("company"),
         }),
       })
@@ -42,8 +65,6 @@ export function BookingModal() {
       setSending(false)
     }
   }
-
-  const giftCard = selectedOffer === t("Gavekort", "Gift card")
 
   return (
     <div
@@ -60,13 +81,26 @@ export function BookingModal() {
             <span>
               <Check />
             </span>
-            <p className="eyebrow">{t("Tak for din besked", "Thank you for your message")}</p>
-            <h2>{t("Vi glæder os til at spille med dig.", "We look forward to playing with you.")}</h2>
+            <p className="eyebrow">
+              {giftCard
+                ? t("Bestillingen er modtaget", "The order is received")
+                : t("Tak for din besked", "Thank you for your message")}
+            </p>
+            <h2>
+              {giftCard
+                ? t("Tjek din mail for betalingen.", "Check your email for payment.")
+                : t("Vi glæder os til at spille med dig.", "We look forward to playing with you.")}
+            </h2>
             <p>
-              {t(
-                "Vi vender tilbage inden for én hverdag med forslag til en tid.",
-                "We will get back to you within one working day with a suggested time.",
-              )}
+              {giftCard
+                ? t(
+                    "Gavekortet sendes til dig, når betalingen er gået ind. Du kan så give det videre.",
+                    "The gift card is emailed to you once the payment has arrived. You can then pass it on.",
+                  )
+                : t(
+                    "Vi vender tilbage inden for én hverdag med forslag til en tid.",
+                    "We will get back to you within one working day with a suggested time.",
+                  )}
             </p>
             <button className="button" onClick={closeBooking}>
               {t("Luk vinduet", "Close window")}
@@ -81,10 +115,15 @@ export function BookingModal() {
                 : `${t("Book", "Book")} ${selectedOffer.toLowerCase()}`}
             </h2>
             <p className="modal-intro">
-              {t(
-                "Udfyld dine oplysninger, så kontakter vi dig og finder den helt rigtige løsning. Du betaler først, når tiden er aftalt.",
-                "Fill in your details and we will contact you to find the right solution. You only pay once a time has been agreed.",
-              )}
+              {giftCard
+                ? t(
+                    "Vælg beløb, modtager og en kort hilsen. Du får en mail med betalingsoplysninger. Gavekortet sendes, når betalingen er gået ind.",
+                    "Choose an amount, a recipient and a short greeting. You will get an email with payment details. The gift card is sent once the payment has arrived.",
+                  )
+                : t(
+                    "Udfyld dine oplysninger, så kontakter vi dig og finder den helt rigtige løsning. Du betaler først, når tiden er aftalt.",
+                    "Fill in your details and we will contact you to find the right solution. You only pay once a time has been agreed.",
+                  )}
             </p>
             <form onSubmit={sendEnquiry}>
               <div className="honeypot" aria-hidden="true">
@@ -114,16 +153,21 @@ export function BookingModal() {
                 {giftCard
                   ? t("Ønsket beløb", "Desired amount")
                   : t("Hvem skal spille?", "Who will be playing?")}
-                <select name="student" defaultValue="" required>
+                <select
+                  name="student"
+                  value={studentChoice}
+                  required
+                  onChange={(event) => setStudentChoice(event.target.value)}
+                >
                   <option value="" disabled>
                     {t("Vælg her", "Choose here")}
                   </option>
                   {giftCard ? (
                     <>
-                      <option>{t("500 kr.", "DKK 500")}</option>
-                      <option>{t("1.000 kr.", "DKK 1,000")}</option>
-                      <option>{t("2.500 kr.", "DKK 2,500")}</option>
-                      <option>{t("Andet beløb", "Other amount")}</option>
+                      <option value={t("500 kr.", "DKK 500")}>{t("500 kr.", "DKK 500")}</option>
+                      <option value={t("1.000 kr.", "DKK 1,000")}>{t("1.000 kr.", "DKK 1,000")}</option>
+                      <option value={t("2.500 kr.", "DKK 2,500")}>{t("2.500 kr.", "DKK 2,500")}</option>
+                      <option value="other">{t("Andet beløb", "Other amount")}</option>
                     </>
                   ) : (
                     <>
@@ -134,6 +178,38 @@ export function BookingModal() {
                   )}
                 </select>
               </label>
+              {giftCard && studentChoice === "other" && (
+                <label>
+                  {t("Beløb i kroner", "Amount in kroner")}
+                  <input
+                    name="amount"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    max={100000}
+                    step={1}
+                    required
+                    placeholder="750"
+                  />
+                </label>
+              )}
+              {giftCard && (
+                <>
+                  <label className="span-2">
+                    {t("Hvem er gavekortet til?", "Who is the gift card for?")}
+                    <input name="recipient" required placeholder={t("Modtagerens navn", "Recipient's name")} />
+                  </label>
+                  <label className="span-2">
+                    {t("En kort hilsen", "A short greeting")}
+                    <textarea
+                      name="greeting"
+                      maxLength={500}
+                      rows={3}
+                      placeholder={t("Valgfri hilsen på kortet", "Optional note on the card")}
+                    />
+                  </label>
+                </>
+              )}
               <p className="form-note">
                 {t(
                   "Vi gemmer oplysningerne, så vi kan svare på din forespørgsel. Vi bruger dem ikke til nyhedsbrev.",
@@ -151,7 +227,9 @@ export function BookingModal() {
               <button className="button" type="submit" disabled={sending}>
                 {sending
                   ? t("Sender…", "Sending…")
-                  : t("Send forespørgsel", "Send enquiry")}{" "}
+                  : giftCard
+                    ? t("Bestil gavekort", "Order gift card")
+                    : t("Send forespørgsel", "Send enquiry")}{" "}
                 {!sending && <Arrow />}
               </button>
             </form>
