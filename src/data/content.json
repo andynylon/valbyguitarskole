@@ -118,6 +118,16 @@
         "tone": "cream"
       },
       {
+        "name": { "da": "5 lektioner", "en": "5 lessons" },
+        "price": { "da": "1.400 kr.", "en": "DKK 1,400" },
+        "text": {
+          "da": "Et kort forløb, når du vil i gang uden at binde dig til en hel sæson.",
+          "en": "A short course when you want to begin without committing to a whole season."
+        },
+        "note": { "da": "5 × 30 min. · Spar 100 kr.", "en": "5 × 30 min. · Save DKK 100" },
+        "tone": "yellow"
+      },
+      {
         "name": { "da": "10 lektioner", "en": "10 lessons" },
         "price": { "da": "2.750 kr.", "en": "DKK 2,750" },
         "text": {
@@ -150,8 +160,8 @@
       "en": "A gift card that keeps on playing"
     },
     "text": {
-      "da": "Vælg beløb og modtager. Du betaler med MobilePay eller bankoverførsel, og vi sender gavekortet, når betalingen er gået ind.",
-      "en": "Choose an amount and a recipient. Pay by MobilePay or bank transfer, and we send the gift card once the payment has arrived."
+      "da": "Vælg 1, 5, 10 eller 20 lektioner. Du betaler med MobilePay eller bankoverførsel, og vi sender gavekortet, når betalingen er gået ind.",
+      "en": "Choose 1, 5, 10 or 20 lessons. Pay by MobilePay or bank transfer, and we send the gift card once the payment has arrived."
     },
     "button": { "da": "Køb gavekort", "en": "Buy a gift card" },
     "bookingName": { "da": "Gavekort", "en": "Gift card" }
