@@ -150,8 +150,8 @@
       "en": "A gift card that keeps on playing"
     },
     "text": {
-      "da": "Vælg selv beløbet, og få et flot digitalt gavekort klar til at give videre.",
-      "en": "Choose the amount and receive a beautiful digital gift card, ready to give."
+      "da": "Vælg beløb og modtager. Du betaler med MobilePay eller bankoverførsel, og vi sender gavekortet, når betalingen er gået ind.",
+      "en": "Choose an amount and a recipient. Pay by MobilePay or bank transfer, and we send the gift card once the payment has arrived."
     },
     "button": { "da": "Køb gavekort", "en": "Buy a gift card" },
     "bookingName": { "da": "Gavekort", "en": "Gift card" }

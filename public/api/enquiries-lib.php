@@ -53,11 +53,12 @@ function enquiries_pdo(): PDO
     ]);
 }
 
-function enquiries_save(array $enquiry): void
+function enquiries_save(array $enquiry): int
 {
-    $statement = enquiries_pdo()->prepare(
-        'INSERT INTO enquiries (offer, name, email, phone, student, language)
-         VALUES (:offer, :name, :email, :phone, :student, :language)'
+    $pdo = enquiries_pdo();
+    $statement = $pdo->prepare(
+        'INSERT INTO enquiries (offer, name, email, phone, student, language, recipient, greeting)
+         VALUES (:offer, :name, :email, :phone, :student, :language, :recipient, :greeting)'
     );
     $statement->execute([
         'offer' => $enquiry['offer'],
@@ -66,7 +67,11 @@ function enquiries_save(array $enquiry): void
         'phone' => $enquiry['phone'],
         'student' => $enquiry['student'],
         'language' => $enquiry['language'] === 'en' ? 'en' : 'da',
+        'recipient' => $enquiry['recipient'] ?? '',
+        'greeting' => $enquiry['greeting'] ?? '',
     ]);
+
+    return (int) $pdo->lastInsertId();
 }
 
 function enquiries_statuses(): array
@@ -79,10 +84,12 @@ function enquiries_list(?string $status): array
     $pdo = enquiries_pdo();
     if ($status !== null && in_array($status, enquiries_statuses(), true)) {
         $statement = $pdo->prepare(
-            'SELECT id, created_at, offer, name, email, phone, student, language, status
-             FROM enquiries
-             WHERE status = :status
-             ORDER BY created_at DESC, id DESC
+            'SELECT e.id, e.created_at, e.offer, e.name, e.email, e.phone, e.student, e.language,
+                    e.recipient, e.greeting, e.status, g.code AS gift_code, g.status AS gift_status
+             FROM enquiries e
+             LEFT JOIN gift_cards g ON g.enquiry_id = e.id
+             WHERE e.status = :status
+             ORDER BY e.created_at DESC, e.id DESC
              LIMIT 500'
         );
         $statement->execute(['status' => $status]);
@@ -91,9 +98,11 @@ function enquiries_list(?string $status): array
     }
 
     return $pdo->query(
-        'SELECT id, created_at, offer, name, email, phone, student, language, status
-         FROM enquiries
-         ORDER BY created_at DESC, id DESC
+        'SELECT e.id, e.created_at, e.offer, e.name, e.email, e.phone, e.student, e.language,
+                e.recipient, e.greeting, e.status, g.code AS gift_code, g.status AS gift_status
+         FROM enquiries e
+         LEFT JOIN gift_cards g ON g.enquiry_id = e.id
+         ORDER BY e.created_at DESC, e.id DESC
          LIMIT 500'
     )->fetchAll();
 }

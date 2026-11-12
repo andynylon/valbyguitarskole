@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/api/content-lib.php';
 require dirname(__DIR__) . '/api/enquiries-lib.php';
+require dirname(__DIR__) . '/api/gift-lib.php';
 
 session_start();
 header('X-Robots-Tag: noindex');
@@ -29,6 +30,30 @@ if (!isset($_SESSION['csrf'])) {
     $_SESSION['csrf'] = bin2hex(random_bytes(16));
 }
 
+function editor_back(string $filter, string $notice): void
+{
+    $query = [];
+    if ($filter !== '') {
+        $query['status'] = $filter;
+    }
+    if ($notice !== '') {
+        $query['notice'] = $notice;
+    }
+    $location = '/redaktor/henvendelser.php';
+    if ($query !== []) {
+        $location .= '?' . http_build_query($query);
+    }
+    header('Location: ' . $location);
+    exit;
+}
+
+function editor_filter(array $statuses): string
+{
+    $filter = (string) ($_POST['filter'] ?? '');
+
+    return isset($statuses[$filter]) ? $filter : '';
+}
+
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $csrf = (string) ($_POST['csrf'] ?? '');
     if (!hash_equals($_SESSION['csrf'], $csrf)) {
@@ -50,6 +75,43 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             exit;
         }
         $error = 'Forkert adgangskode.';
+    } elseif (($_SESSION['editor'] ?? false) && isset($_POST['issue_gift'])) {
+        $nextFilter = editor_filter($statuses);
+        try {
+            $card = gift_issue((int) $_POST['enquiry_id']);
+            try {
+                gift_send($card);
+                editor_back($nextFilter, 'sent');
+            } catch (Throwable $failure) {
+                error_log('Gift card mail failed: ' . $failure->getMessage());
+                editor_back($nextFilter, 'saved');
+            }
+        } catch (Throwable $failure) {
+            $error = 'Gavekortet kunne ikke oprettes. Kør private/gift-cards.sql i phpMyAdmin, hvis tabellen mangler.';
+            error_log('Gift card issue failed: ' . $failure->getMessage());
+        }
+    } elseif (($_SESSION['editor'] ?? false) && isset($_POST['resend_gift'])) {
+        $nextFilter = editor_filter($statuses);
+        try {
+            $card = gift_by_code((string) $_POST['resend_gift']);
+            if ($card === null) {
+                throw new InvalidArgumentException('Unknown gift card');
+            }
+            gift_send($card);
+            editor_back($nextFilter, 'sent');
+        } catch (Throwable $failure) {
+            $error = 'Gavekortet kunne ikke sendes igen.';
+            error_log('Gift card resend failed: ' . $failure->getMessage());
+        }
+    } elseif (($_SESSION['editor'] ?? false) && isset($_POST['redeem_gift'])) {
+        $nextFilter = editor_filter($statuses);
+        try {
+            gift_redeem((string) $_POST['redeem_gift']);
+            editor_back($nextFilter, 'redeemed');
+        } catch (Throwable $failure) {
+            $error = 'Gavekortet kunne ikke markeres som brugt.';
+            error_log('Gift card redeem failed: ' . $failure->getMessage());
+        }
     } elseif (($_SESSION['editor'] ?? false) && isset($_POST['enquiry_id'], $_POST['status'])) {
         $nextFilter = (string) ($_POST['filter'] ?? '');
         if (!isset($statuses[$nextFilter])) {
@@ -78,7 +140,7 @@ if ($signedIn && $databaseConfigured) {
     } catch (Throwable $failure) {
         $databaseReady = false;
         if ($error === '') {
-            $error = 'Henvendelserne kunne ikke hentes. Tjek databaseoplysningerne i ~/private/db-config.php.';
+            $error = 'Henvendelserne kunne ikke hentes. Tjek ~/private/db-config.php, og kør private/gift-cards.sql i phpMyAdmin hvis tabellerne mangler.';
         }
         error_log('Enquiry list failed: ' . $failure->getMessage());
     }
@@ -110,6 +172,9 @@ if ($signedIn && $databaseConfigured) {
     td a { display: block; }
     .status { display: flex; gap: 8px; align-items: center; }
     .logout { margin-top: 20px; }
+    .gift { margin-top: 8px; }
+    .gift form { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .ok { background: #e7f0ea; padding: 12px; }
     @media (max-width: 800px) {
       table, thead, tbody, tr, th, td { display: block; }
       thead { display: none; }
@@ -127,6 +192,15 @@ if ($signedIn && $databaseConfigured) {
       <a href="/redaktor/henvendelser.php">Henvendelser<?php if ($newCount > 0): ?> (<?= $newCount ?> nye)<?php endif; ?></a>
     </nav>
   <?php endif; ?>
+  <?php
+    $notices = [
+        'sent' => 'Gavekortet er sendt til køberen.',
+        'saved' => 'Gavekortet er oprettet, men e-mailen kunne ikke sendes. Brug Send igen.',
+        'redeemed' => 'Gavekortet er markeret som brugt.',
+    ];
+    $notice = (string) ($_GET['notice'] ?? '');
+  ?>
+  <?php if (isset($notices[$notice])): ?><p class="ok"><?= htmlspecialchars($notices[$notice], ENT_QUOTES) ?></p><?php endif; ?>
   <?php if ($error !== ''): ?><p class="error"><?= htmlspecialchars($error, ENT_QUOTES) ?></p><?php endif; ?>
   <?php if ($config === null): ?>
     <p>Opret <code>~/private/cms-config.php</code> ud fra <code>cms-config.example.php</code> i projektet.</p>
@@ -173,7 +247,41 @@ if ($signedIn && $databaseConfigured) {
                 <a href="mailto:<?= htmlspecialchars((string) $enquiry['email'], ENT_QUOTES) ?>"><?= htmlspecialchars((string) $enquiry['email'], ENT_QUOTES) ?></a>
                 <a href="tel:<?= htmlspecialchars(preg_replace('/[^\d+]/', '', (string) $enquiry['phone']) ?? '', ENT_QUOTES) ?>"><?= htmlspecialchars((string) $enquiry['phone'], ENT_QUOTES) ?></a>
               </td>
-              <td><?= htmlspecialchars((string) $enquiry['student'], ENT_QUOTES) ?></td>
+              <td>
+                <?= htmlspecialchars((string) $enquiry['student'], ENT_QUOTES) ?>
+                <?php if (gift_is_offer((string) $enquiry['offer'])): ?>
+                  <div class="gift">
+                    <div>Reference: <?= htmlspecialchars(gift_reference((int) $enquiry['id']), ENT_QUOTES) ?></div>
+                    <?php if (trim((string) ($enquiry['recipient'] ?? '')) !== ''): ?>
+                      <div>Til: <?= htmlspecialchars((string) $enquiry['recipient'], ENT_QUOTES) ?></div>
+                    <?php endif; ?>
+                    <?php if (trim((string) ($enquiry['greeting'] ?? '')) !== ''): ?>
+                      <div>Hilsen: <?= nl2br(htmlspecialchars((string) $enquiry['greeting'], ENT_QUOTES)) ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($enquiry['gift_code'])): ?>
+                      <div>
+                        <a href="/gavekort/index.php?kode=<?= rawurlencode((string) $enquiry['gift_code']) ?>"><?= htmlspecialchars((string) $enquiry['gift_code'], ENT_QUOTES) ?></a>
+                        <?= ($enquiry['gift_status'] ?? '') === 'redeemed' ? 'Brugt' : 'Sendt' ?>
+                      </div>
+                      <form method="post">
+                        <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES) ?>">
+                        <input type="hidden" name="filter" value="<?= htmlspecialchars($filter, ENT_QUOTES) ?>">
+                        <button type="submit" name="resend_gift" value="<?= htmlspecialchars((string) $enquiry['gift_code'], ENT_QUOTES) ?>">Send igen</button>
+                        <?php if (($enquiry['gift_status'] ?? '') !== 'redeemed'): ?>
+                          <button type="submit" name="redeem_gift" value="<?= htmlspecialchars((string) $enquiry['gift_code'], ENT_QUOTES) ?>">Marker som brugt</button>
+                        <?php endif; ?>
+                      </form>
+                    <?php else: ?>
+                      <form method="post">
+                        <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES) ?>">
+                        <input type="hidden" name="enquiry_id" value="<?= (int) $enquiry['id'] ?>">
+                        <input type="hidden" name="filter" value="<?= htmlspecialchars($filter, ENT_QUOTES) ?>">
+                        <button type="submit" name="issue_gift" value="1">Opret gavekort</button>
+                      </form>
+                    <?php endif; ?>
+                  </div>
+                <?php endif; ?>
+              </td>
               <td>
                 <form class="status" method="post">
                   <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES) ?>">
