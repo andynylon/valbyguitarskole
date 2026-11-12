@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require __DIR__ . '/enquiries-lib.php';
+
 header('Content-Type: application/json; charset=utf-8');
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
@@ -42,50 +44,73 @@ if ($offer === '' || $name === '' || $phone === '' || $student === '' || !filter
     exit;
 }
 
+$enquiry = [
+    'offer' => $offer,
+    'name' => $name,
+    'email' => $email,
+    'phone' => $phone,
+    'student' => $student,
+    'language' => $language,
+];
+
+$saved = false;
+if (enquiries_config() !== null) {
+    try {
+        enquiries_save($enquiry);
+        $saved = true;
+    } catch (Throwable $error) {
+        error_log('Enquiry save failed: ' . $error->getMessage());
+    }
+}
+
+$mailed = false;
 $configFile = dirname(__DIR__, 2) . '/private/mail-config.php';
 $config = is_file($configFile) ? require $configFile : null;
-if (!is_array($config) || !isset($config['username'], $config['password'], $config['from'], $config['to'])) {
+if (is_array($config) && isset($config['username'], $config['password'], $config['from'], $config['to'])) {
+    $subject = 'Ny forespørgsel: ' . $offer;
+    $body = implode("\n", [
+        'Tilbud: ' . $offer,
+        'Navn: ' . $name,
+        'E-mail: ' . $email,
+        'Telefon: ' . $phone,
+        'Detalje: ' . $student,
+    ]);
+
+    try {
+        $from = (string) $config['from'];
+        $school = (string) $config['to'];
+        $socket = smtpConnect($config);
+        try {
+            smtpDeliver($socket, $from, $school, $email, $subject, $body, false);
+            $mailed = true;
+            try {
+                [$replySubject, $replyBody] = autoReply($name, $offer, $language);
+                smtpDeliver($socket, $from, $email, $from, $replySubject, $replyBody, true);
+            } catch (Throwable $error) {
+                error_log('Booking auto-reply failed: ' . $error->getMessage());
+            }
+            try {
+                smtpCommand($socket, 'QUIT', 221);
+            } catch (Throwable $error) {
+                error_log('SMTP quit failed: ' . $error->getMessage());
+            }
+        } finally {
+            fclose($socket);
+        }
+    } catch (Throwable $error) {
+        error_log('Booking mail failed: ' . $error->getMessage());
+    }
+} else {
     error_log('Booking mail is not configured');
+}
+
+if (!$saved && !$mailed) {
     http_response_code(500);
     echo json_encode(['ok' => false]);
     exit;
 }
 
-$subject = 'Ny forespørgsel: ' . $offer;
-$body = implode("\n", [
-    'Tilbud: ' . $offer,
-    'Navn: ' . $name,
-    'E-mail: ' . $email,
-    'Telefon: ' . $phone,
-    'Detalje: ' . $student,
-]);
-
-try {
-    $from = (string) $config['from'];
-    $school = (string) $config['to'];
-    $socket = smtpConnect($config);
-    try {
-        smtpDeliver($socket, $from, $school, $email, $subject, $body, false);
-        try {
-            [$replySubject, $replyBody] = autoReply($name, $offer, $language);
-            smtpDeliver($socket, $from, $email, $from, $replySubject, $replyBody, true);
-        } catch (Throwable $error) {
-            error_log('Booking auto-reply failed: ' . $error->getMessage());
-        }
-        try {
-            smtpCommand($socket, 'QUIT', 221);
-        } catch (Throwable $error) {
-            error_log('SMTP quit failed: ' . $error->getMessage());
-        }
-    } finally {
-        fclose($socket);
-    }
-    echo json_encode(['ok' => true]);
-} catch (Throwable $error) {
-    error_log('Booking mail failed: ' . $error->getMessage());
-    http_response_code(500);
-    echo json_encode(['ok' => false]);
-}
+echo json_encode(['ok' => true]);
 
 function autoReply(string $name, string $offer, string $language): array
 {

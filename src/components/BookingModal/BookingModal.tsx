@@ -134,6 +134,12 @@ export function BookingModal() {
                   )}
                 </select>
               </label>
+              <p className="form-note">
+                {t(
+                  "Vi gemmer oplysningerne, så vi kan svare på din forespørgsel. Vi bruger dem ikke til nyhedsbrev.",
+                  "We keep these details so we can answer your enquiry. We do not use them for a newsletter.",
+                )}
+              </p>
               {error && (
                 <p className="form-error" role="alert">
                   {t(

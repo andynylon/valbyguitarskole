@@ -35,7 +35,8 @@
     gap: 16px;
 
     .button,
-    .form-error {
+    .form-error,
+    .form-note {
       grid-column: 1 / -1;
     }
 
@@ -119,6 +120,14 @@
   margin: 0;
   color: $coral-deep;
   font: 13px/1.5 $font-sans;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.form-note {
+  margin: 0;
+  color: $muted-point;
+  font: 12px/1.5 $font-sans;
   text-transform: none;
   letter-spacing: 0;
 }

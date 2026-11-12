@@ -143,6 +143,8 @@ function editor_fields(array $content): string
     input, textarea { width: 100%; box-sizing: border-box; border: 1px solid #18362f33; padding: 10px; font: inherit; }
     textarea { min-height: 72px; }
     .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    a { color: #173f37; }
+    nav { display: flex; gap: 16px; margin: 0 0 20px; }
     button { background: #173f37; color: white; border: 0; min-height: 44px; padding: 0 16px; font: 600 14px system-ui, sans-serif; }
     .row { display: flex; gap: 8px; margin-top: 16px; }
     .error { background: #f8d7d1; padding: 12px; }
@@ -153,6 +155,12 @@ function editor_fields(array $content): string
 <body>
 <main>
   <h1>Rediger siden</h1>
+  <?php if ($signedIn): ?>
+    <nav>
+      <a href="/redaktor/">Rediger siden</a>
+      <a href="/redaktor/henvendelser.php">Henvendelser</a>
+    </nav>
+  <?php endif; ?>
   <?php if ($error !== ''): ?><p class="error"><?= htmlspecialchars($error, ENT_QUOTES) ?></p><?php endif; ?>
   <?php if ($message !== ''): ?><p class="ok"><?= htmlspecialchars($message, ENT_QUOTES) ?></p><?php endif; ?>
   <?php if ($config === null): ?>
