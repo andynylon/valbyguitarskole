@@ -1,12 +1,31 @@
 import { useEffect, useState, type FormEvent } from "react"
 import { useBooking } from "@/context/BookingContext"
+import { useText } from "@/context/ContentContext"
 import { useLanguage } from "@/context/LanguageContext"
+import type { SiteContent } from "@/data/content"
+import type { Language } from "@/data/offers"
 import { Arrow } from "@/components/icons/Arrow"
 import { Check } from "@/components/icons/Check"
 import "./BookingModal.scss"
 
+const giftCourses = [
+  { offer: "Prøvetime", da: "1 lektion", en: "1 lesson", price: { da: "300 kr.", en: "DKK 300" } },
+  { offer: "5 lektioner", da: "5 lektioner", en: "5 lessons", price: { da: "1.400 kr.", en: "DKK 1,400" } },
+  { offer: "10 lektioner", da: "10 lektioner", en: "10 lessons", price: { da: "2.750 kr.", en: "DKK 2,750" } },
+  { offer: "Halvt år", da: "20 lektioner", en: "20 lessons", price: { da: "5.100 kr.", en: "DKK 5,100" } },
+]
+
+function giftPackages(content: SiteContent, language: Language) {
+  return giftCourses.map((course) => {
+    const match = content.pricing.offers.find((offer) => offer.name.da === course.offer)
+    const price = match?.price[language] ?? course.price[language]
+    return `${course[language]} · ${price}`
+  })
+}
+
 export function BookingModal() {
   const { t, language } = useLanguage()
+  const { content } = useText()
   const { selectedOffer, submitted, closeBooking, markSubmitted } = useBooking()
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(false)
@@ -27,18 +46,7 @@ export function BookingModal() {
     setSending(true)
     setError(false)
 
-    let student = String(form.get("student") ?? "")
-    if (giftCard && student === "other") {
-      const amount = Number(String(form.get("amount") ?? "").replace(",", "."))
-      if (!Number.isFinite(amount) || amount < 1 || amount > 100000) {
-        setSending(false)
-        setError(true)
-        return
-      }
-      const rounded = Math.round(amount)
-      const formatted = new Intl.NumberFormat(language === "en" ? "en-GB" : "da-DK").format(rounded)
-      student = language === "en" ? `DKK ${formatted}` : `${formatted} kr.`
-    }
+    const student = String(form.get("student") ?? "")
 
     try {
       const response = await fetch("/api/booking.php", {
@@ -117,8 +125,8 @@ export function BookingModal() {
             <p className="modal-intro">
               {giftCard
                 ? t(
-                    "Vælg beløb, modtager og en kort hilsen. Du får en mail med betalingsoplysninger. Gavekortet sendes, når betalingen er gået ind.",
-                    "Choose an amount, a recipient and a short greeting. You will get an email with payment details. The gift card is sent once the payment has arrived.",
+                    "Vælg et forløb, en modtager og en kort hilsen. Du får en mail med betalingsoplysninger. Gavekortet sendes, når betalingen er gået ind.",
+                    "Choose a course, a recipient and a short greeting. You will get an email with payment details. The gift card is sent once the payment has arrived.",
                   )
                 : t(
                     "Udfyld dine oplysninger, så kontakter vi dig og finder den helt rigtige løsning. Du betaler først, når tiden er aftalt.",
@@ -150,9 +158,7 @@ export function BookingModal() {
                 <input type="tel" name="phone" required placeholder="+45 12 34 56 78" />
               </label>
               <label>
-                {giftCard
-                  ? t("Ønsket beløb", "Desired amount")
-                  : t("Hvem skal spille?", "Who will be playing?")}
+                {giftCard ? t("Forløb", "Course") : t("Hvem skal spille?", "Who will be playing?")}
                 <select
                   name="student"
                   value={studentChoice}
@@ -163,12 +169,11 @@ export function BookingModal() {
                     {t("Vælg her", "Choose here")}
                   </option>
                   {giftCard ? (
-                    <>
-                      <option value={t("500 kr.", "DKK 500")}>{t("500 kr.", "DKK 500")}</option>
-                      <option value={t("1.000 kr.", "DKK 1,000")}>{t("1.000 kr.", "DKK 1,000")}</option>
-                      <option value={t("2.500 kr.", "DKK 2,500")}>{t("2.500 kr.", "DKK 2,500")}</option>
-                      <option value="other">{t("Andet beløb", "Other amount")}</option>
-                    </>
+                    giftPackages(content, language).map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))
                   ) : (
                     <>
                       <option>{t("Mig selv", "Myself")}</option>
@@ -178,21 +183,6 @@ export function BookingModal() {
                   )}
                 </select>
               </label>
-              {giftCard && studentChoice === "other" && (
-                <label>
-                  {t("Beløb i kroner", "Amount in kroner")}
-                  <input
-                    name="amount"
-                    type="number"
-                    inputMode="numeric"
-                    min={1}
-                    max={100000}
-                    step={1}
-                    required
-                    placeholder="750"
-                  />
-                </label>
-              )}
               {giftCard && (
                 <>
                   <label className="span-2">

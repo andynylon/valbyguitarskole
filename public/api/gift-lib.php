@@ -54,59 +54,52 @@ function gift_order_reply(string $name, string $amount, string $recipient, strin
 {
     $reference = $id > 0 ? gift_reference($id) : '';
     $payment = gift_payment_lines();
-    if ($language === 'en') {
-        $lines = [
-            'Hi ' . $name . ',',
-            '',
-            'Thank you for ordering a gift card of ' . $amount . ' for ' . $recipient . '.',
-            '',
-            'Pay ' . $amount . ' by MobilePay or bank transfer.',
+    $english = $language === 'en';
+    $safeName = mail_esc($name);
+    $safeAmount = mail_esc($amount);
+    $safeRecipient = mail_esc($recipient);
+
+    if ($english) {
+        $subject = 'Pay for your Valby Guitarskole gift card';
+        $paragraphs = [
+            'Hi ' . $safeName . ',',
+            'Thank you for ordering a gift card of ' . $safeAmount . ' for ' . $safeRecipient . '.',
+            'Pay ' . $safeAmount . ' by MobilePay or bank transfer.',
         ];
         if ($reference !== '') {
-            $lines[] = 'Write this reference in the payment message: ' . $reference;
+            $paragraphs[] = 'Write this reference in the payment message: <span style="color:#173f37;">' . mail_esc($reference) . '</span>';
         }
-        if ($payment !== []) {
-            $lines[] = '';
-            array_push($lines, ...$payment);
-        } else {
-            $lines[] = 'Reply to this email if you need the account details.';
+        $fallback = 'Reply to this email if you need the account details.';
+        $closing = 'When the payment has arrived, we will email the gift card to this address so you can pass it on.';
+    } else {
+        $subject = 'Betal dit gavekort til Valby Guitarskole';
+        $paragraphs = [
+            'Hej ' . $safeName . ',',
+            'Tak for din bestilling af et gavekort på ' . $safeAmount . ' til ' . $safeRecipient . '.',
+            'Betal ' . $safeAmount . ' med MobilePay eller bankoverførsel.',
+        ];
+        if ($reference !== '') {
+            $paragraphs[] = 'Skriv denne reference i beskeden: <span style="color:#173f37;">' . mail_esc($reference) . '</span>';
         }
-        $lines[] = '';
-        $lines[] = 'When the payment has arrived, we will email the gift card to this address so you can pass it on.';
-        $lines[] = '';
-        $lines[] = 'Kind regards';
-        $lines[] = 'Valby Guitarskole';
-        $lines[] = 'hej@valbyguitarskole.dk';
-        $lines[] = '+45 26 32 18 40';
-
-        return ['Pay for your Valby Guitarskole gift card', implode("\n", $lines)];
+        $fallback = 'Svar på denne mail, hvis du mangler kontonummeret.';
+        $closing = 'Når betalingen er gået ind, sender vi gavekortet til denne e-mail, så du kan give det videre.';
     }
 
-    $lines = [
-        'Hej ' . $name . ',',
-        '',
-        'Tak for din bestilling af et gavekort på ' . $amount . ' til ' . $recipient . '.',
-        '',
-        'Betal ' . $amount . ' med MobilePay eller bankoverførsel.',
-    ];
-    if ($reference !== '') {
-        $lines[] = 'Skriv denne reference i beskeden: ' . $reference;
+    $body = mail_brand();
+    foreach ($paragraphs as $paragraph) {
+        $body .= mail_p($paragraph);
     }
     if ($payment !== []) {
-        $lines[] = '';
-        array_push($lines, ...$payment);
+        $last = count($payment) - 1;
+        foreach ($payment as $index => $line) {
+            $body .= mail_p(mail_esc($line), $index === $last ? '0 0 16px' : '0 0 6px');
+        }
     } else {
-        $lines[] = 'Svar på denne mail, hvis du mangler kontonummeret.';
+        $body .= mail_p($fallback);
     }
-    $lines[] = '';
-    $lines[] = 'Når betalingen er gået ind, sender vi gavekortet til denne e-mail, så du kan give det videre.';
-    $lines[] = '';
-    $lines[] = 'Venlig hilsen';
-    $lines[] = 'Valby Guitarskole';
-    $lines[] = 'hej@valbyguitarskole.dk';
-    $lines[] = '+45 26 32 18 40';
+    $body .= mail_p($closing) . mail_signoff($english);
 
-    return ['Betal dit gavekort til Valby Guitarskole', implode("\n", $lines)];
+    return [$subject, mail_shell($english ? 'en' : 'da', mail_card($body))];
 }
 
 function gift_by_code(string $code): ?array
@@ -186,24 +179,23 @@ function gift_send(array $card): void
         : 'Gavekortet er klar til at give videre.';
     $open = $english ? 'Open the gift card' : 'Åbn gavekortet';
     $for = $english ? 'For' : 'Til';
-    $safe = static fn (string $value): string => htmlspecialchars($value, ENT_QUOTES);
-    $greetingHtml = $greeting === ''
-        ? ''
-        : '<p style="margin:18px 0 0;font-style:italic;font-size:18px;">' . nl2br($safe($greeting)) . '</p>';
-
-    $html = '<!doctype html><html><body style="margin:0;background:#f5eedd;">'
-        . '<div style="max-width:460px;margin:0 auto;padding:32px 20px;font-family:Georgia,serif;color:#18362f;">'
-        . '<p style="margin:0 0 24px;font-family:sans-serif;font-size:14px;">' . $safe($intro) . '</p>'
-        . '<div style="background:#fffaf0;border:1px solid #173f37;padding:32px 28px;">'
-        . '<p style="margin:0;font-family:sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#da5944;">Valby Guitarskole</p>'
-        . '<h1 style="margin:14px 0 0;font-weight:400;font-size:40px;">' . ($english ? 'Gift card' : 'Gavekort') . '</h1>'
-        . '<p style="margin:18px 0 0;font-size:28px;">' . $safe($amount) . '</p>'
-        . '<p style="margin:8px 0 0;font-family:sans-serif;font-size:14px;">' . $safe($for) . ' ' . $safe($recipient) . '</p>'
-        . $greetingHtml
-        . '<p style="margin:28px 0 0;font-family:sans-serif;letter-spacing:.16em;font-size:14px;">' . $safe($code) . '</p>'
-        . '</div>'
-        . '<p style="margin:24px 0 0;font-family:sans-serif;font-size:14px;"><a href="' . $safe($url) . '" style="color:#173f37;">' . $safe($open) . '</a></p>'
-        . '</div></body></html>';
+    $title = $english ? 'Gift card' : 'Gavekort';
+    $sans = mail_sans();
+    $serif = mail_serif();
+    $cardInner = mail_brand()
+        . '<h1 style="margin:0;font-family:' . $serif . ';font-size:40px;line-height:1.05;font-weight:400;color:#173f37;">' . $title . '</h1>'
+        . '<p style="margin:16px 0 0;font-family:' . $serif . ';font-size:22px;line-height:1.35;color:#18362f;">' . mail_esc($amount) . '</p>'
+        . '<p style="margin:10px 0 0;font-family:' . $sans . ';font-size:15px;line-height:1.5;color:#18362f;">' . mail_esc($for) . ' ' . mail_esc($recipient) . '</p>'
+        . mail_lines($greeting, 'margin:14px 0 0;font-family:' . $serif . ';font-style:italic;font-size:18px;line-height:1.45;color:#18362f;')
+        . '<p style="margin:28px 0 0;padding-top:16px;border-top:1px solid #eadfcd;font-family:' . $sans . ';font-size:14px;line-height:1.4;letter-spacing:0.16em;color:#173f37;">' . mail_esc($code) . '</p>'
+        . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:22px;"><tr>'
+        . '<td bgcolor="#173f37" style="background-color:#173f37;padding:12px 18px;">'
+        . '<a href="' . mail_esc($url) . '" style="font-family:' . $sans . ';font-size:14px;line-height:1.2;color:#fffaf0;text-decoration:none;">' . mail_esc($open) . '</a>'
+        . '</td></tr></table>';
+    $html = mail_shell(
+        $english ? 'en' : 'da',
+        mail_p($intro, '0 0 20px') . mail_card($cardInner) . mail_signoff($english)
+    );
 
     $mail = mail_config();
     if ($mail === null) {

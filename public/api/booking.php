@@ -77,30 +77,14 @@ $configFile = dirname(__DIR__, 2) . '/private/mail-config.php';
 $config = is_file($configFile) ? require $configFile : null;
 if (is_array($config) && isset($config['username'], $config['password'], $config['from'], $config['to'])) {
     $subject = ($gift ? 'Nyt gavekort: ' : 'Ny forespørgsel: ') . $offer;
-    $lines = [
-        'Tilbud: ' . $offer,
-        'Navn: ' . $name,
-        'E-mail: ' . $email,
-        'Telefon: ' . $phone,
-        'Detalje: ' . $student,
-    ];
-    if ($gift) {
-        $lines[] = 'Til: ' . $recipient;
-        if ($greeting !== '') {
-            $lines[] = 'Hilsen: ' . $greeting;
-        }
-        if ($enquiryId > 0) {
-            $lines[] = 'Reference: ' . gift_reference($enquiryId);
-        }
-    }
-    $body = implode("\n", $lines);
+    $body = enquiryMail($gift, $offer, $name, $email, $phone, $student, $recipient, $greeting, $enquiryId);
 
     try {
         $from = (string) $config['from'];
         $school = (string) $config['to'];
         $socket = smtpConnect($config);
         try {
-            smtpDeliver($socket, $from, $school, $email, $subject, $body, false);
+            smtpDeliver($socket, $from, $school, $email, $subject, $body, false, 'text/html');
             $mailed = true;
             try {
                 if ($gift) {
@@ -108,7 +92,7 @@ if (is_array($config) && isset($config['username'], $config['password'], $config
                 } else {
                     [$replySubject, $replyBody] = autoReply($name, $offer, $language);
                 }
-                smtpDeliver($socket, $from, $email, $from, $replySubject, $replyBody, true);
+                smtpDeliver($socket, $from, $email, $from, $replySubject, $replyBody, true, 'text/html');
             } catch (Throwable $error) {
                 error_log('Booking auto-reply failed: ' . $error->getMessage());
             }
@@ -135,41 +119,71 @@ if (!$saved && !$mailed) {
 
 echo json_encode(['ok' => true]);
 
-function autoReply(string $name, string $offer, string $language): array
-{
-    if ($language === 'en') {
-        return [
-            'We have received your enquiry',
-            implode("\n", [
-                'Hi ' . $name . ',',
-                '',
-                'Thank you for your message. We have received your enquiry about ' . $offer . ' and will get back to you as soon as we can, within one working day.',
-                '',
-                'We look forward to playing with you.',
-                '',
-                'Kind regards',
-                'Valby Guitarskole',
-                'hej@valbyguitarskole.dk',
-                '+45 26 32 18 40',
-            ]),
-        ];
+function enquiryMail(
+    bool $gift,
+    string $offer,
+    string $name,
+    string $email,
+    string $phone,
+    string $detail,
+    string $recipient,
+    string $greeting,
+    int $enquiryId
+): string {
+    $sans = mail_sans();
+    $labelStyle = 'padding:9px 16px 9px 0;border-bottom:1px solid #eadfcd;font-family:' . $sans . ';font-size:12px;line-height:1.4;letter-spacing:0.04em;text-transform:uppercase;color:#da5944;vertical-align:top;';
+    $valueStyle = 'padding:9px 0;border-bottom:1px solid #eadfcd;font-family:' . $sans . ';font-size:15px;line-height:1.45;color:#18362f;vertical-align:top;';
+    $rows = [
+        ['Tilbud', mail_esc($offer)],
+        ['Navn', mail_esc($name)],
+        ['E-mail', '<a href="mailto:' . mail_esc($email) . '" style="color:#173f37;text-decoration:underline;">' . mail_esc($email) . '</a>'],
+        ['Telefon', mail_esc($phone)],
+        ['Detalje', mail_esc($detail)],
+    ];
+    if ($gift) {
+        $rows[] = ['Til', mail_esc($recipient)];
+        if ($greeting !== '') {
+            $rows[] = ['Hilsen', mail_lines($greeting, 'margin:0 0 8px;font-family:' . $sans . ';font-size:15px;line-height:1.45;color:#18362f;')];
+        }
+        if ($enquiryId > 0) {
+            $rows[] = ['Reference', mail_esc(gift_reference($enquiryId))];
+        }
     }
 
-    return [
-        'Vi har modtaget din forespørgsel',
-        implode("\n", [
-            'Hej ' . $name . ',',
-            '',
-            'Tak for din besked. Vi har modtaget din forespørgsel om ' . $offer . ' og vender tilbage hurtigst muligt, senest inden for én hverdag.',
-            '',
-            'Vi glæder os til at spille med dig.',
-            '',
-            'Venlig hilsen',
-            'Valby Guitarskole',
-            'hej@valbyguitarskole.dk',
-            '+45 26 32 18 40',
-        ]),
-    ];
+    $table = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">';
+    foreach ($rows as [$label, $value]) {
+        $table .= '<tr><td valign="top" style="' . $labelStyle . '">' . mail_esc($label) . '</td>'
+            . '<td valign="top" style="' . $valueStyle . '">' . $value . '</td></tr>';
+    }
+    $table .= '</table>';
+
+    $title = $gift ? 'Nyt gavekort' : 'Ny forespørgsel';
+    $heading = '<h1 style="margin:0 0 18px;font-family:' . mail_serif() . ';font-size:32px;line-height:1.15;font-weight:400;color:#173f37;">' . $title . '</h1>';
+
+    return mail_shell('da', mail_card(mail_brand() . $heading . $table));
+}
+
+function autoReply(string $name, string $offer, string $language): array
+{
+    $safeName = mail_esc($name);
+    $safeOffer = mail_esc($offer);
+    if ($language === 'en') {
+        $body = mail_brand()
+            . mail_p('Hi ' . $safeName . ',')
+            . mail_p('Thank you for your message. We have received your enquiry about ' . $safeOffer . ' and will get back to you as soon as we can, within one working day.')
+            . mail_p('We look forward to playing with you.')
+            . mail_signoff(true);
+
+        return ['We have received your enquiry', mail_shell('en', mail_card($body))];
+    }
+
+    $body = mail_brand()
+        . mail_p('Hej ' . $safeName . ',')
+        . mail_p('Tak for din besked. Vi har modtaget din forespørgsel om ' . $safeOffer . ' og vender tilbage hurtigst muligt, senest inden for én hverdag.')
+        . mail_p('Vi glæder os til at spille med dig.')
+        . mail_signoff(false);
+
+    return ['Vi har modtaget din forespørgsel', mail_shell('da', mail_card($body))];
 }
 
 function field(array $payload, string $key, int $max): string
