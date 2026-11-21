@@ -30,18 +30,28 @@ export function Prompts() {
   const { content, tx } = useText()
   const { selectedOffer, newsletter, openBooking, openNewsletter } = useBooking()
   const { campaignOpen } = useNotices()
-  const [giftState, setGiftState] = useState(() => readCookie(GIFT_COOKIE))
-  const [newsletterDone, setNewsletterDone] = useState(() => readCookie(NEWSLETTER_COOKIE) === "done")
-  const [cookiesAccepted, setCookiesAccepted] = useState(() => readCookie(COOKIE_NOTICE) === "1")
+  const [giftState, setGiftState] = useState<string | null>(null)
+  const [newsletterDone, setNewsletterDone] = useState(false)
+  const [cookiesAccepted, setCookiesAccepted] = useState(false)
+  const [preferencesRead, setPreferencesRead] = useState(false)
   const [giftClosedThisVisit, setGiftClosedThisVisit] = useState(false)
   const [teaserClosed, setTeaserClosed] = useState(false)
-  const arrivedRejected = useRef(giftState === "rejected")
+  const arrivedRejected = useRef(false)
+
+  useEffect(() => {
+    const gift = readCookie(GIFT_COOKIE)
+    arrivedRejected.current = gift === "rejected"
+    setGiftState(gift)
+    setNewsletterDone(readCookie(NEWSLETTER_COOKIE) === "done")
+    setCookiesAccepted(readCookie(COOKIE_NOTICE) === "1")
+    setPreferencesRead(true)
+  }, [])
   const returnOpened = useRef(false)
   const sawNewsletter = useRef(false)
   const giftDialog = useRef<HTMLDivElement>(null)
 
   const blocked = Boolean(selectedOffer || newsletter || campaignOpen)
-  const giftReady = useAfter(10_000, !giftState, blocked)
+  const giftReady = useAfter(10_000, preferencesRead && !giftState, blocked)
   const showGift = giftReady && !blocked && !giftState
   const teaserReady = useAfter(
     10_000,
@@ -51,7 +61,7 @@ export function Prompts() {
   const showTeaser = teaserReady && !blocked && !showGift && !teaserClosed && !newsletterDone
   const newsletterReady = useAfter(
     5_000,
-    arrivedRejected.current && !newsletterDone,
+    preferencesRead && arrivedRejected.current && !newsletterDone,
     blocked || showGift,
   )
 
@@ -161,7 +171,7 @@ export function Prompts() {
               </button>
             </aside>
           )}
-          {!cookiesAccepted && (
+          {preferencesRead && !cookiesAccepted && (
             <div className="cookie-bar" role="dialog" aria-labelledby="cookie-text">
               <p id="cookie-text">{tx(content.cookies.text)}</p>
               <button className="button button-small button-light" type="button" onClick={acceptCookies}>

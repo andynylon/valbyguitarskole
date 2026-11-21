@@ -1,4 +1,5 @@
 export function readCookie(name: string) {
+  if (typeof document === "undefined") return null
   const row = document.cookie.split("; ").find((part) => part.startsWith(`${name}=`))
   if (!row) return null
   return decodeURIComponent(row.slice(name.length + 1))
