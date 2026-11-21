@@ -20,7 +20,7 @@
 .nav {
   display: flex;
   align-items: center;
-  gap: clamp(21px, 2.7vw, 42px);
+  gap: clamp(16px, 2vw, 36px);
 
   > a {
     color: $ink;

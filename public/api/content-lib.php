@@ -24,7 +24,7 @@ function content_read(): ?array
         }
         $data = json_decode((string) file_get_contents($path), true);
         if (is_array($data) && isset($data['updated'], $data['hero']['titleLine1']['da'], $data['pricing']['offers'])) {
-            return $data;
+            return content_fill_missing($data);
         }
     }
 
@@ -93,6 +93,53 @@ function content_trigger_rebuild(array $config): ?string
     }
 
     return 'Indholdet er gemt, men GitHub startede ikke et nyt build (HTTP ' . $status . ').';
+}
+
+function content_fill_missing(array $content): array
+{
+    if (!is_file(content_default_path())) {
+        return $content;
+    }
+    $defaults = json_decode((string) file_get_contents(content_default_path()), true);
+    if (!is_array($defaults)) {
+        return $content;
+    }
+
+    return content_fill_missing_keys($content, $defaults);
+}
+
+function content_fill_missing_keys(array $content, array $defaults): array
+{
+    foreach ($defaults as $key => $value) {
+        if (!array_key_exists($key, $content)) {
+            $content[$key] = $value;
+            continue;
+        }
+        if (is_array($value) && is_array($content[$key]) && array_is_list($value) && array_is_list($content[$key])) {
+            foreach ($content[$key] as $index => $item) {
+                $fallbackItem = $value[$index] ?? null;
+                if (
+                    is_array($item)
+                    && is_array($fallbackItem)
+                    && !array_is_list($item)
+                    && !array_is_list($fallbackItem)
+                ) {
+                    $content[$key][$index] = content_fill_missing_keys($item, $fallbackItem);
+                }
+            }
+            continue;
+        }
+        if (
+            is_array($value)
+            && is_array($content[$key])
+            && !array_is_list($value)
+            && !array_is_list($content[$key])
+        ) {
+            $content[$key] = content_fill_missing_keys($content[$key], $value);
+        }
+    }
+
+    return $content;
 }
 
 function content_apply_fields(array $content, array $fields): array

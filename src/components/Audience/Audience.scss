@@ -22,8 +22,8 @@
   border-top: 1px solid rgb(24 54 47 / 20%);
 
   article {
-    min-height: 395px;
-    padding: 30px clamp(20px, 3vw, 50px);
+    min-height: 280px;
+    padding: 22px clamp(16px, 2.2vw, 36px);
     border-right: 1px solid rgb(24 54 47 / 20%);
     position: relative;
 
@@ -40,16 +40,18 @@
     @include mobile {
       border-right: 0;
       border-bottom: 1px solid rgb(24 54 47 / 20%);
-      min-height: 340px;
+      min-height: 240px;
     }
   }
 
   h3 {
     font-size: 21px;
-    margin: 20px 0 15px;
+    margin: 12px 0 10px;
   }
 
   p {
+    max-width: 26ch;
+    margin-inline: auto;
     font-size: 13px;
     line-height: 1.7;
     color: $muted-copy;
@@ -78,14 +80,14 @@
 }
 
 .line-icon {
-  height: 108px;
-  margin: 20px auto 8px;
+  height: 72px;
+  margin: 12px auto 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: $coral-icon;
   font-family: $font-serif;
-  font-size: 100px;
+  font-size: 68px;
   font-weight: 300;
 }
 
@@ -94,17 +96,17 @@
   transform: rotate(-20deg);
 
   i {
-    height: 80px;
+    height: 54px;
     width: 1.5px;
     background: $coral-icon;
     position: relative;
 
     &:nth-child(2) {
-      height: 95px;
+      height: 64px;
     }
 
     &:nth-child(3) {
-      height: 70px;
+      height: 48px;
     }
 
     &::after {
@@ -123,6 +125,14 @@
 
 .wave-icon {
   transform: rotate(-12deg);
+}
+
+.instrument-note {
+  max-width: 620px;
+  margin: 16px auto 0;
+  color: $muted-soft;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .center-note {

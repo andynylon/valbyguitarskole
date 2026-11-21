@@ -1,0 +1,123 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.campaign-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgb(13 38 33 / 78%);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+  animation: campaign-fade 0.2s ease;
+}
+
+.campaign {
+  width: min(100%, 520px);
+  background: $paper;
+  position: relative;
+  box-shadow: 0 30px 100px rgb(0 0 0 / 30%);
+  animation: campaign-rise 0.3s ease;
+  outline: none;
+
+  h2 {
+    font-size: clamp(42px, 6vw, 56px);
+    margin: 0 0 16px;
+  }
+}
+
+.campaign-close {
+  position: absolute;
+  right: 16px;
+  top: 10px;
+  background: transparent;
+  border: 0;
+  font: 300 30px $font-sans;
+  color: $cream;
+}
+
+.campaign-offer {
+  background: $forest;
+  color: $cream;
+  padding: 32px 36px 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+
+  .eyebrow {
+    margin: 0;
+    color: $coral-sun;
+  }
+}
+
+.campaign-price {
+  margin: 0;
+  text-align: right;
+  font: italic 64px/0.85 $font-serif;
+  color: $yellow;
+
+  span {
+    display: block;
+    margin-top: 8px;
+    font: 600 11px/1.3 $font-sans;
+    letter-spacing: 0.04em;
+    color: rgb(245 238 221 / 72%);
+  }
+}
+
+.campaign-body {
+  padding: 32px 36px 28px;
+
+  > p {
+    margin: 0 0 26px;
+    color: $muted-point;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
+
+.campaign-dismiss {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  border: 0;
+  background: transparent;
+  color: $muted-soft;
+  font: 600 13px $font-sans;
+  min-height: 44px;
+
+  &:hover {
+    color: $ink;
+  }
+}
+
+@keyframes campaign-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes campaign-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@include mobile {
+  .campaign-offer,
+  .campaign-body {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .campaign-price {
+    font-size: 52px;
+  }
+}

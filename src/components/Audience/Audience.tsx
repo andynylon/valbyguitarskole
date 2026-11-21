@@ -50,6 +50,7 @@ export function Audience() {
         <strong>{tx(audience.noteStrong)}</strong>
         {tx(audience.noteAfter)}
       </p>
+      <p className="instrument-note">{tx(audience.instrumentNote)}</p>
     </section>
   )
 }

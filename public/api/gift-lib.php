@@ -50,7 +50,7 @@ function gift_payment_lines(): array
     return $lines;
 }
 
-function gift_order_reply(string $name, string $amount, string $recipient, string $language, int $id): array
+function gift_order_reply(string $name, string $amount, string $recipient, string $language, int $id, bool $newsletter = false): array
 {
     $reference = $id > 0 ? gift_reference($id) : '';
     $payment = gift_payment_lines();
@@ -71,6 +71,7 @@ function gift_order_reply(string $name, string $amount, string $recipient, strin
         }
         $fallback = 'Reply to this email if you need the account details.';
         $closing = 'When the payment has arrived, we will email the gift card to this address so you can pass it on.';
+        $newsletterLine = $newsletter ? 'You are also signed up for the newsletter.' : '';
     } else {
         $subject = 'Betal dit gavekort til Valby Guitarskole';
         $paragraphs = [
@@ -83,6 +84,7 @@ function gift_order_reply(string $name, string $amount, string $recipient, strin
         }
         $fallback = 'Svar på denne mail, hvis du mangler kontonummeret.';
         $closing = 'Når betalingen er gået ind, sender vi gavekortet til denne e-mail, så du kan give det videre.';
+        $newsletterLine = $newsletter ? 'Du er også tilmeldt nyhedsbrevet.' : '';
     }
 
     $body = mail_brand();
@@ -96,6 +98,9 @@ function gift_order_reply(string $name, string $amount, string $recipient, strin
         }
     } else {
         $body .= mail_p($fallback);
+    }
+    if ($newsletterLine !== '') {
+        $body .= mail_p($newsletterLine);
     }
     $body .= mail_p($closing) . mail_signoff($english);
 

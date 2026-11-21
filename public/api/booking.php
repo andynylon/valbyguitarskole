@@ -34,17 +34,21 @@ if (trim((string) ($payload['company'] ?? '')) !== '') {
     exit;
 }
 
-$offer = field($payload, 'offer', 200);
+$signup = field($payload, 'kind', 20) === 'newsletter';
+$offer = $signup ? 'Nyhedsbrev' : field($payload, 'offer', 200);
 $name = field($payload, 'name', 200);
 $email = field($payload, 'email', 200);
-$phone = field($payload, 'phone', 50);
-$student = field($payload, 'student', 200);
+$phone = $signup ? '' : field($payload, 'phone', 50);
+$student = $signup ? '' : field($payload, 'student', 200);
+$instrument = $signup ? '' : field($payload, 'instrument', 80);
 $recipient = field($payload, 'recipient', 200);
 $greeting = note_field($payload, 'greeting', 500);
 $language = field($payload, 'language', 2) === 'en' ? 'en' : 'da';
-$gift = gift_is_offer($offer);
+$gift = !$signup && gift_is_offer($offer);
+$newsletter = $signup || (($payload['newsletter'] ?? false) === true);
+$rental = !$signup && (($payload['rental'] ?? false) === true);
 
-if ($offer === '' || $name === '' || $phone === '' || $student === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || ($gift && $recipient === '')) {
+if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || (!$signup && ($offer === '' || $phone === '' || $student === '' || $instrument === '')) || ($gift && $recipient === '')) {
     http_response_code(400);
     echo json_encode(['ok' => false]);
     exit;
@@ -56,7 +60,10 @@ $enquiry = [
     'email' => $email,
     'phone' => $phone,
     'student' => $student,
+    'instrument' => $instrument,
+    'rent_instrument' => $rental,
     'language' => $language,
+    'newsletter' => $newsletter,
     'recipient' => $gift ? $recipient : '',
     'greeting' => $gift ? $greeting : '',
 ];
@@ -76,8 +83,8 @@ $mailed = false;
 $configFile = dirname(__DIR__, 2) . '/private/mail-config.php';
 $config = is_file($configFile) ? require $configFile : null;
 if (is_array($config) && isset($config['username'], $config['password'], $config['from'], $config['to'])) {
-    $subject = ($gift ? 'Nyt gavekort: ' : 'Ny forespørgsel: ') . $offer;
-    $body = enquiryMail($gift, $offer, $name, $email, $phone, $student, $recipient, $greeting, $enquiryId);
+    $subject = $signup ? 'Ny tilmelding til nyhedsbrev' : (($gift ? 'Nyt gavekort: ' : 'Ny forespørgsel: ') . $offer);
+    $body = enquiryMail($gift, $offer, $name, $email, $phone, $student, $instrument, $rental, $recipient, $greeting, $enquiryId, $newsletter);
 
     try {
         $from = (string) $config['from'];
@@ -87,10 +94,12 @@ if (is_array($config) && isset($config['username'], $config['password'], $config
             smtpDeliver($socket, $from, $school, $email, $subject, $body, false, 'text/html');
             $mailed = true;
             try {
-                if ($gift) {
-                    [$replySubject, $replyBody] = gift_order_reply($name, $student, $recipient, $language, $enquiryId);
+                if ($signup) {
+                    [$replySubject, $replyBody] = newsletterReply($name, $language);
+                } elseif ($gift) {
+                    [$replySubject, $replyBody] = gift_order_reply($name, $student, $recipient, $language, $enquiryId, $newsletter);
                 } else {
-                    [$replySubject, $replyBody] = autoReply($name, $offer, $language);
+                    [$replySubject, $replyBody] = autoReply($name, $offer, $language, $newsletter);
                 }
                 smtpDeliver($socket, $from, $email, $from, $replySubject, $replyBody, true, 'text/html');
             } catch (Throwable $error) {
@@ -126,9 +135,12 @@ function enquiryMail(
     string $email,
     string $phone,
     string $detail,
+    string $instrument,
+    bool $rental,
     string $recipient,
     string $greeting,
-    int $enquiryId
+    int $enquiryId,
+    bool $newsletter
 ): string {
     $sans = mail_sans();
     $labelStyle = 'padding:9px 16px 9px 0;border-bottom:1px solid #eadfcd;font-family:' . $sans . ';font-size:12px;line-height:1.4;letter-spacing:0.04em;text-transform:uppercase;color:#da5944;vertical-align:top;';
@@ -137,9 +149,20 @@ function enquiryMail(
         ['Tilbud', mail_esc($offer)],
         ['Navn', mail_esc($name)],
         ['E-mail', '<a href="mailto:' . mail_esc($email) . '" style="color:#173f37;text-decoration:underline;">' . mail_esc($email) . '</a>'],
-        ['Telefon', mail_esc($phone)],
-        ['Detalje', mail_esc($detail)],
     ];
+    if ($phone !== '') {
+        $rows[] = ['Telefon', mail_esc($phone)];
+    }
+    if ($detail !== '') {
+        $rows[] = ['Detalje', mail_esc($detail)];
+    }
+    if ($instrument !== '') {
+        $rows[] = ['Instrument', mail_esc($instrument)];
+    }
+    if ($rental) {
+        $rows[] = ['Leje', 'Ja'];
+    }
+    $rows[] = ['Nyhedsbrev', $newsletter ? 'Ja' : 'Nej'];
     if ($gift) {
         $rows[] = ['Til', mail_esc($recipient)];
         if ($greeting !== '') {
@@ -157,13 +180,13 @@ function enquiryMail(
     }
     $table .= '</table>';
 
-    $title = $gift ? 'Nyt gavekort' : 'Ny forespørgsel';
+    $title = $offer === 'Nyhedsbrev' ? 'Ny tilmelding' : ($gift ? 'Nyt gavekort' : 'Ny forespørgsel');
     $heading = '<h1 style="margin:0 0 18px;font-family:' . mail_serif() . ';font-size:32px;line-height:1.15;font-weight:400;color:#173f37;">' . $title . '</h1>';
 
     return mail_shell('da', mail_card(mail_brand() . $heading . $table));
 }
 
-function autoReply(string $name, string $offer, string $language): array
+function autoReply(string $name, string $offer, string $language, bool $newsletter): array
 {
     $safeName = mail_esc($name);
     $safeOffer = mail_esc($offer);
@@ -171,6 +194,7 @@ function autoReply(string $name, string $offer, string $language): array
         $body = mail_brand()
             . mail_p('Hi ' . $safeName . ',')
             . mail_p('Thank you for your message. We have received your enquiry about ' . $safeOffer . ' and will get back to you as soon as we can, within one working day.')
+            . ($newsletter ? mail_p('You are also signed up for the newsletter.') : '')
             . mail_p('We look forward to playing with you.')
             . mail_signoff(true);
 
@@ -180,10 +204,31 @@ function autoReply(string $name, string $offer, string $language): array
     $body = mail_brand()
         . mail_p('Hej ' . $safeName . ',')
         . mail_p('Tak for din besked. Vi har modtaget din forespørgsel om ' . $safeOffer . ' og vender tilbage hurtigst muligt, senest inden for én hverdag.')
+        . ($newsletter ? mail_p('Du er også tilmeldt nyhedsbrevet.') : '')
         . mail_p('Vi glæder os til at spille med dig.')
         . mail_signoff(false);
 
     return ['Vi har modtaget din forespørgsel', mail_shell('da', mail_card($body))];
+}
+
+function newsletterReply(string $name, string $language): array
+{
+    $safeName = mail_esc($name);
+    if ($language === 'en') {
+        $body = mail_brand()
+            . mail_p('Hi ' . $safeName . ',')
+            . mail_p('Thank you for joining the newsletter. We will write when there is news from the school. You can unsubscribe at any time by replying to this email.')
+            . mail_signoff(true);
+
+        return ['You are signed up for the newsletter', mail_shell('en', mail_card($body))];
+    }
+
+    $body = mail_brand()
+        . mail_p('Hej ' . $safeName . ',')
+        . mail_p('Tak, fordi du tilmelder dig nyhedsbrevet. Vi skriver, når der er nyt fra skolen. Du kan altid framelde dig ved at svare på denne mail.')
+        . mail_signoff(false);
+
+    return ['Du er tilmeldt nyhedsbrevet', mail_shell('da', mail_card($body))];
 }
 
 function field(array $payload, string $key, int $max): string

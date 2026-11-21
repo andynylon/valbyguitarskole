@@ -30,6 +30,12 @@
   }
 }
 
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 .contact-side > p {
   margin: 0 0 28px;
   font-size: 14px;

@@ -25,6 +25,7 @@ $filter = (string) ($_GET['status'] ?? '');
 if (!isset($statuses[$filter])) {
     $filter = '';
 }
+$newsletterOnly = ($_GET['newsletter'] ?? '') === '1';
 
 if (!isset($_SESSION['csrf'])) {
     $_SESSION['csrf'] = bin2hex(random_bytes(16));
@@ -135,7 +136,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 $signedIn = (bool) ($_SESSION['editor'] ?? false);
 if ($signedIn && $databaseConfigured) {
     try {
-        $enquiries = enquiries_list($filter === '' ? null : $filter);
+        $enquiries = enquiries_list($filter === '' ? null : $filter, $newsletterOnly);
         $newCount = enquiries_count_new();
     } catch (Throwable $failure) {
         $databaseReady = false;
@@ -215,10 +216,11 @@ if ($signedIn && $databaseConfigured) {
   <?php elseif ($databaseReady): ?>
     <p>Her ligger de forespørgsler, som er sendt fra siden. Mailen til skolen sendes stadig.</p>
     <div class="filters">
-      <a href="/redaktor/henvendelser.php"<?= $filter === '' ? ' aria-current="true"' : '' ?>>Alle</a>
+      <a href="/redaktor/henvendelser.php"<?= $filter === '' && !$newsletterOnly ? ' aria-current="true"' : '' ?>>Alle</a>
       <?php foreach ($statuses as $value => $label): ?>
-        <a href="/redaktor/henvendelser.php?status=<?= rawurlencode($value) ?>"<?= $filter === $value ? ' aria-current="true"' : '' ?>><?= htmlspecialchars($label, ENT_QUOTES) ?></a>
+        <a href="/redaktor/henvendelser.php?status=<?= rawurlencode($value) ?>"<?= $filter === $value && !$newsletterOnly ? ' aria-current="true"' : '' ?>><?= htmlspecialchars($label, ENT_QUOTES) ?></a>
       <?php endforeach; ?>
+      <a href="/redaktor/henvendelser.php?newsletter=1"<?= $newsletterOnly ? ' aria-current="true"' : '' ?>>Nyhedsbrev</a>
     </div>
     <?php if ($enquiries === []): ?>
       <p class="notice">Der er ingen henvendelser her.</p>
@@ -238,17 +240,30 @@ if ($signedIn && $databaseConfigured) {
           <?php foreach ($enquiries as $enquiry): ?>
             <tr>
               <td><?= htmlspecialchars((string) $enquiry['created_at'], ENT_QUOTES) ?></td>
-              <td><?= htmlspecialchars((string) $enquiry['offer'], ENT_QUOTES) ?></td>
+              <td>
+                <?= htmlspecialchars((string) $enquiry['offer'], ENT_QUOTES) ?>
+                <?php if (!empty($enquiry['newsletter']) && (string) $enquiry['offer'] !== 'Nyhedsbrev'): ?>
+                  <div>Nyhedsbrev</div>
+                <?php endif; ?>
+              </td>
               <td>
                 <?= htmlspecialchars((string) $enquiry['name'], ENT_QUOTES) ?>
                 <br><?= htmlspecialchars((string) $enquiry['language'], ENT_QUOTES) ?>
               </td>
               <td>
                 <a href="mailto:<?= htmlspecialchars((string) $enquiry['email'], ENT_QUOTES) ?>"><?= htmlspecialchars((string) $enquiry['email'], ENT_QUOTES) ?></a>
-                <a href="tel:<?= htmlspecialchars(preg_replace('/[^\d+]/', '', (string) $enquiry['phone']) ?? '', ENT_QUOTES) ?>"><?= htmlspecialchars((string) $enquiry['phone'], ENT_QUOTES) ?></a>
+                <?php if (trim((string) $enquiry['phone']) !== ''): ?>
+                  <a href="tel:<?= htmlspecialchars(preg_replace('/[^\d+]/', '', (string) $enquiry['phone']) ?? '', ENT_QUOTES) ?>"><?= htmlspecialchars((string) $enquiry['phone'], ENT_QUOTES) ?></a>
+                <?php endif; ?>
               </td>
               <td>
                 <?= htmlspecialchars((string) $enquiry['student'], ENT_QUOTES) ?>
+                <?php if (trim((string) ($enquiry['instrument'] ?? '')) !== ''): ?>
+                  <div><?= htmlspecialchars((string) $enquiry['instrument'], ENT_QUOTES) ?></div>
+                <?php endif; ?>
+                <?php if (!empty($enquiry['rent_instrument'])): ?>
+                  <div>Leje</div>
+                <?php endif; ?>
                 <?php if (gift_is_offer((string) $enquiry['offer'])): ?>
                   <div class="gift">
                     <div>Reference: <?= htmlspecialchars(gift_reference((int) $enquiry['id']), ENT_QUOTES) ?></div>

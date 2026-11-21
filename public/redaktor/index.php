@@ -94,10 +94,15 @@ function editor_fields(array $content): string
                 'hero' => 'Forside',
                 'marquee' => 'Bånd',
                 'audience' => 'Undervisning',
+                'instruments' => 'Instrumenter',
                 'pricing' => 'Priser',
                 'gift' => 'Gavekort',
+                'teachers' => 'Undervisere',
                 'about' => 'Om skolen',
                 'contact' => 'Kontakt',
+                'newsletter' => 'Nyhedsbrev',
+                'campaign' => 'Kampagne',
+                'cookies' => 'Cookies',
                 'footer' => 'Sidefod',
             ][$section] ?? $section;
             $html .= '<section><h2>' . htmlspecialchars($title, ENT_QUOTES) . '</h2>';

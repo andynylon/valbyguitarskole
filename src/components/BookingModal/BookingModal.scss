@@ -37,6 +37,7 @@
     .button,
     .form-error,
     .form-note,
+    .newsletter-choice,
     .span-2 {
       grid-column: 1 / -1;
     }
@@ -69,6 +70,23 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.09em;
+  }
+
+  label.newsletter-choice {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+    text-transform: none;
+    letter-spacing: 0;
+    font: 500 14px/1.45 $font-sans;
+
+    input {
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+      padding: 0;
+      accent-color: $forest;
+    }
   }
 
   input,

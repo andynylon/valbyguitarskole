@@ -1,0 +1,3 @@
+ALTER TABLE enquiries
+    ADD COLUMN instrument VARCHAR(80) NOT NULL DEFAULT '',
+    ADD COLUMN rent_instrument TINYINT(1) NOT NULL DEFAULT 0;

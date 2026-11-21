@@ -1,9 +1,11 @@
+import { useBooking } from "@/context/BookingContext"
 import { useText } from "@/context/ContentContext"
 import { Logo } from "@/components/Logo/Logo"
 import "./Footer.scss"
 
 export function Footer() {
   const { content, tx } = useText()
+  const { openNewsletter } = useBooking()
   const footer = content.footer
   const phoneHref = `tel:${footer.phone.replace(/[^\d+]/g, "")}`
 
@@ -34,6 +36,9 @@ export function Footer() {
         <p className="footer-label">{tx(footer.follow)}</p>
         <a href="#instagram">Instagram</a>
         <a href="#facebook">Facebook</a>
+        <button className="button button-light button-small footer-newsletter" onClick={openNewsletter}>
+          {tx(content.newsletter.button)}
+        </button>
       </div>
       <p className="copyright">© 2025 Valby Guitarskole</p>
     </footer>

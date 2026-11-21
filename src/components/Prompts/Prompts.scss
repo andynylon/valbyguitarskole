@@ -1,0 +1,161 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.prompt-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgb(13 38 33 / 78%);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+}
+
+.gift-prompt {
+  width: min(100%, 520px);
+  background: $paper;
+  position: relative;
+  box-shadow: 0 30px 100px rgb(0 0 0 / 30%);
+  outline: none;
+
+  h2 {
+    font-size: clamp(36px, 5vw, 48px);
+    line-height: 0.95;
+    margin: 0 0 16px;
+  }
+}
+
+.gift-prompt-close {
+  position: absolute;
+  right: 16px;
+  top: 10px;
+  background: transparent;
+  border: 0;
+  font: 300 30px $font-sans;
+  color: $cream;
+}
+
+.gift-prompt-head {
+  background: $forest;
+  color: $cream;
+  padding: 32px 36px 26px;
+
+  .eyebrow {
+    margin: 0;
+    color: $coral-sun;
+  }
+}
+
+.gift-prompt-body {
+  padding: 32px 36px 28px;
+
+  > p {
+    margin: 0 0 26px;
+    color: $muted-point;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
+
+.prompt-dismiss {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  border: 0;
+  background: transparent;
+  color: $muted-soft;
+  font: 600 13px $font-sans;
+  min-height: 44px;
+
+  &:hover {
+    color: $ink;
+  }
+}
+
+.prompt-dock {
+  position: fixed;
+  z-index: 75;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.newsletter-teaser {
+  width: min(100%, 360px);
+  background: $paper;
+  color: $ink;
+  padding: 22px 22px 18px;
+  box-shadow: 0 18px 50px rgb(24 54 47 / 22%);
+  position: relative;
+
+  .eyebrow {
+    margin: 0 0 8px;
+  }
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    line-height: 1;
+  }
+
+  > p {
+    margin: 0 0 16px;
+    color: $muted-copy;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+.teaser-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: 0;
+  background: transparent;
+  color: $muted-soft;
+  font: 300 28px $font-sans;
+}
+
+.cookie-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  background: $forest;
+  color: $cream;
+  padding: 16px 18px;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@include mobile {
+  .gift-prompt-head,
+  .gift-prompt-body {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}

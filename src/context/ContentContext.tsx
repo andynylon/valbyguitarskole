@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from "react"
-import { initialContent, isSiteContent, type SiteContent } from "@/data/content"
+import { fillMissingContent, initialContent, isSiteContent, type SiteContent } from "@/data/content"
 import { useLanguage } from "@/context/LanguageContext"
 
 type ContentContextValue = {
@@ -24,7 +24,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       .then((response) => (response.ok ? response.json() : null))
       .then((next: unknown) => {
         if (!isSiteContent(next) || next.updated === content.updated) return
-        setContent(next)
+        setContent(fillMissingContent(next, initialContent))
       })
       .catch(() => {})
 

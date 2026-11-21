@@ -53,14 +53,64 @@ function enquiries_pdo(): PDO
     ]);
 }
 
+function enquiries_ensure_column(PDO $pdo, string $column, string $definition): bool
+{
+    static $cache = [];
+    if (($cache[$column] ?? false) === true) {
+        return true;
+    }
+
+    $found = $pdo->query('SHOW COLUMNS FROM enquiries LIKE ' . $pdo->quote($column))->fetch();
+    if ($found) {
+        $cache[$column] = true;
+
+        return true;
+    }
+
+    try {
+        $pdo->exec('ALTER TABLE enquiries ADD COLUMN ' . $column . ' ' . $definition);
+        $cache[$column] = true;
+
+        return true;
+    } catch (Throwable $error) {
+        error_log('Enquiry column ' . $column . ' missing: ' . $error->getMessage());
+        $cache[$column] = false;
+
+        return false;
+    }
+}
+
+function enquiries_newsletter_ready(PDO $pdo): bool
+{
+    static $ready = null;
+    if ($ready === true) {
+        return true;
+    }
+
+    $found = $pdo->query("SHOW COLUMNS FROM enquiries LIKE 'newsletter'")->fetch();
+    if ($found) {
+        $ready = true;
+
+        return true;
+    }
+
+    try {
+        $pdo->exec('ALTER TABLE enquiries ADD COLUMN newsletter TINYINT(1) NOT NULL DEFAULT 0 AFTER language');
+        $ready = true;
+
+        return true;
+    } catch (Throwable $error) {
+        error_log('Newsletter column missing: ' . $error->getMessage());
+        $ready = false;
+
+        return false;
+    }
+}
+
 function enquiries_save(array $enquiry): int
 {
     $pdo = enquiries_pdo();
-    $statement = $pdo->prepare(
-        'INSERT INTO enquiries (offer, name, email, phone, student, language, recipient, greeting)
-         VALUES (:offer, :name, :email, :phone, :student, :language, :recipient, :greeting)'
-    );
-    $statement->execute([
+    $values = [
         'offer' => $enquiry['offer'],
         'name' => $enquiry['name'],
         'email' => $enquiry['email'],
@@ -69,7 +119,25 @@ function enquiries_save(array $enquiry): int
         'language' => $enquiry['language'] === 'en' ? 'en' : 'da',
         'recipient' => $enquiry['recipient'] ?? '',
         'greeting' => $enquiry['greeting'] ?? '',
-    ]);
+    ];
+    $columns = ['offer', 'name', 'email', 'phone', 'student', 'language', 'recipient', 'greeting'];
+    if (enquiries_newsletter_ready($pdo)) {
+        $columns[] = 'newsletter';
+        $values['newsletter'] = !empty($enquiry['newsletter']) ? 1 : 0;
+    }
+    if (enquiries_ensure_column($pdo, 'instrument', "VARCHAR(80) NOT NULL DEFAULT ''")) {
+        $columns[] = 'instrument';
+        $values['instrument'] = (string) ($enquiry['instrument'] ?? '');
+    }
+    if (enquiries_ensure_column($pdo, 'rent_instrument', 'TINYINT(1) NOT NULL DEFAULT 0')) {
+        $columns[] = 'rent_instrument';
+        $values['rent_instrument'] = !empty($enquiry['rent_instrument']) ? 1 : 0;
+    }
+    $placeholders = array_map(static fn (string $column): string => ':' . $column, $columns);
+    $statement = $pdo->prepare(
+        'INSERT INTO enquiries (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $placeholders) . ')'
+    );
+    $statement->execute($values);
 
     return (int) $pdo->lastInsertId();
 }
@@ -79,32 +147,39 @@ function enquiries_statuses(): array
     return ['new', 'contacted', 'booked', 'closed'];
 }
 
-function enquiries_list(?string $status): array
+function enquiries_list(?string $status, bool $newsletterOnly = false): array
 {
     $pdo = enquiries_pdo();
+    $newsletter = enquiries_newsletter_ready($pdo) ? 'e.newsletter' : '0 AS newsletter';
+    $instrument = enquiries_ensure_column($pdo, 'instrument', "VARCHAR(80) NOT NULL DEFAULT ''")
+        ? 'e.instrument'
+        : "'' AS instrument";
+    $rental = enquiries_ensure_column($pdo, 'rent_instrument', 'TINYINT(1) NOT NULL DEFAULT 0')
+        ? 'e.rent_instrument'
+        : '0 AS rent_instrument';
+    $where = [];
+    $params = [];
     if ($status !== null && in_array($status, enquiries_statuses(), true)) {
-        $statement = $pdo->prepare(
-            'SELECT e.id, e.created_at, e.offer, e.name, e.email, e.phone, e.student, e.language,
-                    e.recipient, e.greeting, e.status, g.code AS gift_code, g.status AS gift_status
-             FROM enquiries e
-             LEFT JOIN gift_cards g ON g.enquiry_id = e.id
-             WHERE e.status = :status
-             ORDER BY e.created_at DESC, e.id DESC
-             LIMIT 500'
-        );
-        $statement->execute(['status' => $status]);
-
-        return $statement->fetchAll();
+        $where[] = 'e.status = :status';
+        $params['status'] = $status;
+    }
+    if ($newsletterOnly && $newsletter !== '0 AS newsletter') {
+        $where[] = 'e.newsletter = 1';
     }
 
-    return $pdo->query(
-        'SELECT e.id, e.created_at, e.offer, e.name, e.email, e.phone, e.student, e.language,
-                e.recipient, e.greeting, e.status, g.code AS gift_code, g.status AS gift_status
+    $sql = 'SELECT e.id, e.created_at, e.offer, e.name, e.email, e.phone, e.student, e.language, '
+        . $newsletter . ', ' . $instrument . ', ' . $rental . ', e.recipient, e.greeting, e.status, g.code AS gift_code, g.status AS gift_status
          FROM enquiries e
-         LEFT JOIN gift_cards g ON g.enquiry_id = e.id
-         ORDER BY e.created_at DESC, e.id DESC
-         LIMIT 500'
-    )->fetchAll();
+         LEFT JOIN gift_cards g ON g.enquiry_id = e.id';
+    if ($where !== []) {
+        $sql .= ' WHERE ' . implode(' AND ', $where);
+    }
+    $sql .= ' ORDER BY e.created_at DESC, e.id DESC LIMIT 500';
+
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+
+    return $statement->fetchAll();
 }
 
 function enquiries_count_new(): int

@@ -10,7 +10,6 @@ export type Offer = {
   text: Localized
   note: Localized
   tone: OfferTone
-  featured?: boolean
 }
 
 export const offers: Offer[] = [
@@ -46,7 +45,6 @@ export const offers: Offer[] = [
       en: "10 × 30 min. · Save DKK 250",
     },
     tone: "coral",
-    featured: true,
   },
   {
     name: { da: "Halvt år", en: "Six months" },

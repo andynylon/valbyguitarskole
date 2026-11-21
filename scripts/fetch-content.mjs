@@ -17,6 +17,33 @@ function isContent(value) {
   )
 }
 
+function fillMissing(current, fallback) {
+  if (Array.isArray(current) && Array.isArray(fallback)) {
+    return current.map((item, index) => {
+      const fallbackItem = fallback[index]
+      if (
+        item &&
+        fallbackItem &&
+        typeof item === "object" &&
+        typeof fallbackItem === "object" &&
+        !Array.isArray(item) &&
+        !Array.isArray(fallbackItem)
+      ) {
+        return fillMissing(item, fallbackItem)
+      }
+      return item
+    })
+  }
+  if (!fallback || typeof fallback !== "object" || Array.isArray(fallback)) return current
+  if (!current || typeof current !== "object" || Array.isArray(current)) return current
+  const next = { ...current }
+  for (const [key, value] of Object.entries(fallback)) {
+    if (!(key in next)) next[key] = value
+    else next[key] = fillMissing(next[key], value)
+  }
+  return next
+}
+
 function publish(json) {
   fs.writeFileSync(contentPath, json)
   fs.mkdirSync(path.dirname(defaultPath), { recursive: true })
@@ -33,7 +60,9 @@ if (!url) {
     if (!response.ok) throw new Error(`Content request failed (${response.status})`)
     const data = await response.json()
     if (!isContent(data)) throw new Error("Content response did not match the page")
-    publish(JSON.stringify(data, null, 2) + "\n")
+    const bundled = JSON.parse(fs.readFileSync(contentPath, "utf8"))
+    const merged = fillMissing(data, bundled)
+    publish(JSON.stringify(merged, null, 2) + "\n")
     console.log(`Fetched content updated at ${data.updated}`)
   } catch (error) {
     if (required) throw error

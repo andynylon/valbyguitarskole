@@ -25,7 +25,6 @@ export function Pricing() {
       <div className="offer-grid">
         {pricing.offers.map((offer) => (
           <article className={`offer-card ${offer.tone}`} key={offer.name.da}>
-            {offer.featured && <span className="popular">{tx(pricing.popular)}</span>}
             <p className="offer-name">{tx(offer.name)}</p>
             <h3>{tx(offer.price)}</h3>
             <p className="offer-text">{tx(offer.text)}</p>

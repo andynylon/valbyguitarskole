@@ -25,20 +25,26 @@ function giftPackages(content: SiteContent, language: Language) {
 
 export function BookingModal() {
   const { t, language } = useLanguage()
-  const { content } = useText()
-  const { selectedOffer, submitted, closeBooking, markSubmitted } = useBooking()
+  const { content, tx } = useText()
+  const { selectedOffer, newsletter, submitted, closeBooking, markSubmitted } = useBooking()
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(false)
   const [studentChoice, setStudentChoice] = useState("")
+  const [instrumentChoice, setInstrumentChoice] = useState("")
 
   useEffect(() => {
     setStudentChoice("")
+    setInstrumentChoice("")
     setError(false)
-  }, [selectedOffer])
+  }, [selectedOffer, newsletter])
 
-  if (!selectedOffer) return null
+  if (!selectedOffer && !newsletter) return null
 
   const giftCard = selectedOffer === t("Gavekort", "Gift card")
+  const newsletterCopy = content.newsletter
+  const campaignOffer =
+    selectedOffer === content.campaign.bookingName.da ||
+    selectedOffer === content.campaign.bookingName.en
 
   async function sendEnquiry(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -53,12 +59,16 @@ export function BookingModal() {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
-          offer: selectedOffer,
+          kind: newsletter ? "newsletter" : "enquiry",
+          offer: selectedOffer ?? "",
           language,
           name: form.get("name"),
           email: form.get("email"),
           phone: form.get("phone"),
           student,
+          instrument: form.get("instrument"),
+          rental: form.get("rental") === "yes",
+          newsletter: newsletter || form.get("newsletter") === "yes",
           recipient: giftCard ? form.get("recipient") : "",
           greeting: giftCard ? form.get("greeting") : "",
           company: form.get("company"),
@@ -90,25 +100,31 @@ export function BookingModal() {
               <Check />
             </span>
             <p className="eyebrow">
-              {giftCard
-                ? t("Bestillingen er modtaget", "The order is received")
-                : t("Tak for din besked", "Thank you for your message")}
+              {newsletter
+                ? tx(newsletterCopy.eyebrow)
+                : giftCard
+                  ? t("Bestillingen er modtaget", "The order is received")
+                  : t("Tak for din besked", "Thank you for your message")}
             </p>
             <h2>
-              {giftCard
-                ? t("Tjek din mail for betalingen.", "Check your email for payment.")
-                : t("Vi glæder os til at spille med dig.", "We look forward to playing with you.")}
+              {newsletter
+                ? tx(newsletterCopy.successTitle)
+                : giftCard
+                  ? t("Tjek din mail for betalingen.", "Check your email for payment.")
+                  : t("Vi glæder os til at spille med dig.", "We look forward to playing with you.")}
             </h2>
             <p>
-              {giftCard
-                ? t(
-                    "Gavekortet sendes til dig, når betalingen er gået ind. Du kan så give det videre.",
-                    "The gift card is emailed to you once the payment has arrived. You can then pass it on.",
-                  )
-                : t(
-                    "Vi vender tilbage inden for én hverdag med forslag til en tid.",
-                    "We will get back to you within one working day with a suggested time.",
-                  )}
+              {newsletter
+                ? tx(newsletterCopy.successText)
+                : giftCard
+                  ? t(
+                      "Gavekortet sendes til dig, når betalingen er gået ind. Du kan så give det videre.",
+                      "The gift card is emailed to you once the payment has arrived. You can then pass it on.",
+                    )
+                  : t(
+                      "Vi vender tilbage inden for én hverdag med forslag til en tid.",
+                      "We will get back to you within one working day with a suggested time.",
+                    )}
             </p>
             <button className="button" onClick={closeBooking}>
               {t("Luk vinduet", "Close window")}
@@ -116,22 +132,36 @@ export function BookingModal() {
           </div>
         ) : (
           <>
-            <p className="eyebrow">{t("Næste skridt", "Next step")}</p>
+            <p className="eyebrow">
+              {newsletter
+                ? tx(newsletterCopy.eyebrow)
+                : campaignOffer
+                  ? tx(content.campaign.eyebrow)
+                  : t("Næste skridt", "Next step")}
+            </p>
             <h2 id="modal-title">
-              {giftCard
-                ? t("Bestil et gavekort", "Order a gift card")
-                : `${t("Book", "Book")} ${selectedOffer.toLowerCase()}`}
+              {newsletter
+                ? tx(newsletterCopy.title)
+                : campaignOffer
+                  ? tx(content.campaign.formTitle)
+                  : giftCard
+                    ? t("Bestil et gavekort", "Order a gift card")
+                    : `${t("Book", "Book")} ${selectedOffer?.toLowerCase()}`}
             </h2>
             <p className="modal-intro">
-              {giftCard
-                ? t(
-                    "Vælg et forløb, en modtager og en kort hilsen. Du får en mail med betalingsoplysninger. Gavekortet sendes, når betalingen er gået ind.",
-                    "Choose a course, a recipient and a short greeting. You will get an email with payment details. The gift card is sent once the payment has arrived.",
-                  )
-                : t(
-                    "Udfyld dine oplysninger, så kontakter vi dig og finder den helt rigtige løsning. Du betaler først, når tiden er aftalt.",
-                    "Fill in your details and we will contact you to find the right solution. You only pay once a time has been agreed.",
-                  )}
+              {newsletter
+                ? tx(newsletterCopy.intro)
+                : campaignOffer
+                  ? tx(content.campaign.formIntro)
+                  : giftCard
+                    ? t(
+                        "Vælg et forløb, en modtager og en kort hilsen. Du får en mail med betalingsoplysninger. Gavekortet sendes, når betalingen er gået ind.",
+                        "Choose a course, a recipient and a short greeting. You will get an email with payment details. The gift card is sent once the payment has arrived.",
+                      )
+                    : t(
+                        "Udfyld dine oplysninger, så kontakter vi dig og finder den helt rigtige løsning. Du betaler først, når tiden er aftalt.",
+                        "Fill in your details and we will contact you to find the right solution. You only pay once a time has been agreed.",
+                      )}
             </p>
             <form onSubmit={sendEnquiry}>
               <div className="honeypot" aria-hidden="true">
@@ -153,58 +183,90 @@ export function BookingModal() {
                   placeholder={t("dig@email.dk", "you@email.com")}
                 />
               </label>
-              <label>
-                {t("Telefon", "Phone")}
-                <input type="tel" name="phone" required placeholder="+45 12 34 56 78" />
-              </label>
-              <label>
-                {giftCard ? t("Forløb", "Course") : t("Hvem skal spille?", "Who will be playing?")}
-                <select
-                  name="student"
-                  value={studentChoice}
-                  required
-                  onChange={(event) => setStudentChoice(event.target.value)}
-                >
-                  <option value="" disabled>
-                    {t("Vælg her", "Choose here")}
-                  </option>
-                  {giftCard ? (
-                    giftPackages(content, language).map((option) => (
-                      <option key={option} value={option}>
-                        {option}
+              {!newsletter && (
+                <>
+                  <label>
+                    {t("Telefon", "Phone")}
+                    <input type="tel" name="phone" required placeholder="+45 12 34 56 78" />
+                  </label>
+                  <label>
+                    {giftCard ? t("Forløb", "Course") : t("Hvem skal spille?", "Who will be playing?")}
+                    <select
+                      name="student"
+                      value={studentChoice}
+                      required
+                      onChange={(event) => setStudentChoice(event.target.value)}
+                    >
+                      <option value="" disabled>
+                        {t("Vælg her", "Choose here")}
                       </option>
-                    ))
-                  ) : (
+                      {giftCard ? (
+                        giftPackages(content, language).map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))
+                      ) : (
+                        <>
+                          <option>{t("Mig selv", "Myself")}</option>
+                          <option>{t("Mit barn", "My child")}</option>
+                          <option>{t("En anden", "Someone else")}</option>
+                        </>
+                      )}
+                    </select>
+                  </label>
+                  <label>
+                    {tx(content.instruments.label)}
+                    <select
+                      name="instrument"
+                      value={instrumentChoice}
+                      required
+                      onChange={(event) => setInstrumentChoice(event.target.value)}
+                    >
+                      <option value="" disabled>
+                        {t("Vælg her", "Choose here")}
+                      </option>
+                      {content.instruments.options.map((option) => (
+                        <option key={option.da} value={tx(option)}>
+                          {tx(option)}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="newsletter-choice">
+                    <input type="checkbox" name="rental" value="yes" />
+                    <span>{tx(content.instruments.rental)}</span>
+                  </label>
+                  {giftCard && (
                     <>
-                      <option>{t("Mig selv", "Myself")}</option>
-                      <option>{t("Mit barn", "My child")}</option>
-                      <option>{t("En anden", "Someone else")}</option>
+                      <label className="span-2">
+                        {t("Hvem er gavekortet til?", "Who is the gift card for?")}
+                        <input name="recipient" required placeholder={t("Modtagerens navn", "Recipient's name")} />
+                      </label>
+                      <label className="span-2">
+                        {t("En kort hilsen", "A short greeting")}
+                        <textarea
+                          name="greeting"
+                          maxLength={500}
+                          rows={3}
+                          placeholder={t("Valgfri hilsen på kortet", "Optional note on the card")}
+                        />
+                      </label>
                     </>
                   )}
-                </select>
-              </label>
-              {giftCard && (
-                <>
-                  <label className="span-2">
-                    {t("Hvem er gavekortet til?", "Who is the gift card for?")}
-                    <input name="recipient" required placeholder={t("Modtagerens navn", "Recipient's name")} />
-                  </label>
-                  <label className="span-2">
-                    {t("En kort hilsen", "A short greeting")}
-                    <textarea
-                      name="greeting"
-                      maxLength={500}
-                      rows={3}
-                      placeholder={t("Valgfri hilsen på kortet", "Optional note on the card")}
-                    />
+                  <label className="newsletter-choice">
+                    <input type="checkbox" name="newsletter" value="yes" />
+                    <span>{tx(newsletterCopy.checkbox)}</span>
                   </label>
                 </>
               )}
               <p className="form-note">
-                {t(
-                  "Vi gemmer oplysningerne, så vi kan svare på din forespørgsel. Vi bruger dem ikke til nyhedsbrev.",
-                  "We keep these details so we can answer your enquiry. We do not use them for a newsletter.",
-                )}
+                {newsletter
+                  ? tx(newsletterCopy.note)
+                  : t(
+                      "Vi gemmer oplysningerne, så vi kan svare på din forespørgsel. Nyhedsbrevet sender vi kun, hvis du selv krydser af.",
+                      "We keep these details so we can answer your enquiry. We only send the newsletter if you tick the box.",
+                    )}
               </p>
               {error && (
                 <p className="form-error" role="alert">
@@ -217,9 +279,11 @@ export function BookingModal() {
               <button className="button" type="submit" disabled={sending}>
                 {sending
                   ? t("Sender…", "Sending…")
-                  : giftCard
-                    ? t("Bestil gavekort", "Order gift card")
-                    : t("Send forespørgsel", "Send enquiry")}{" "}
+                  : newsletter
+                    ? tx(newsletterCopy.submit)
+                    : giftCard
+                      ? t("Bestil gavekort", "Order gift card")
+                      : t("Send forespørgsel", "Send enquiry")}{" "}
                 {!sending && <Arrow />}
               </button>
             </form>

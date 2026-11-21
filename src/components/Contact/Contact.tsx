@@ -5,7 +5,7 @@ import "./Contact.scss"
 
 export function Contact() {
   const { content, tx } = useText()
-  const { openBooking } = useBooking()
+  const { openBooking, openNewsletter } = useBooking()
   const contact = content.contact
 
   return (
@@ -20,12 +20,17 @@ export function Contact() {
       </div>
       <div className="contact-side">
         <p>{tx(contact.text)}</p>
-        <button
-          className="button button-light"
-          onClick={() => openBooking(tx(contact.bookingName))}
-        >
-          {tx(contact.button)} <Arrow />
-        </button>
+        <div className="contact-actions">
+          <button
+            className="button button-light"
+            onClick={() => openBooking(tx(contact.bookingName))}
+          >
+            {tx(contact.button)} <Arrow />
+          </button>
+          <button className="button button-ghost" onClick={openNewsletter}>
+            {tx(content.newsletter.button)}
+          </button>
+        </div>
       </div>
     </section>
   )

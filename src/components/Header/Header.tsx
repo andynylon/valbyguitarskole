@@ -16,6 +16,7 @@ export function Header() {
   const links = [
     { href: "#undervisning", label: tx(content.nav.lessons) },
     { href: "#priser", label: tx(content.nav.pricing) },
+    { href: "#undervisere", label: tx(content.nav.teachers) },
     { href: "#om", label: tx(content.nav.about) },
     { href: "#kontakt", label: tx(content.nav.contact) },
   ]
