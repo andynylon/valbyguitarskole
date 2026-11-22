@@ -1,0 +1,7 @@
+Options -Indexes -MultiViews
+RewriteEngine On
+
+# This file is copied into the staging deploy only.
+# Every request on that host goes through the login gate.
+RewriteCond %{REQUEST_URI} !^/staging-gate\.php(?:\?|$)
+RewriteRule ^ staging-gate.php [L,QSA]
