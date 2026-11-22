@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require dirname(__DIR__) . '/api/content-lib.php';
+require dirname(__DIR__) . '/api/students-lib.php';
 
 session_start();
 header('X-Robots-Tag: noindex');
@@ -50,6 +51,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 }
 
 $signedIn = (bool) ($_SESSION['editor'] ?? false);
+$studentFollowups = $signedIn ? students_followup_count() : 0;
 
 function editor_input_name(string $path): string
 {
@@ -164,6 +166,7 @@ function editor_fields(array $content): string
     <nav>
       <a href="/redaktor/">Rediger siden</a>
       <a href="/redaktor/henvendelser.php">Henvendelser</a>
+      <a href="/redaktor/elever.php">Elever<?php if ($studentFollowups > 0): ?> (<?= $studentFollowups ?> opfølgning)<?php endif; ?></a>
     </nav>
   <?php endif; ?>
   <?php if ($error !== ''): ?><p class="error"><?= htmlspecialchars($error, ENT_QUOTES) ?></p><?php endif; ?>
