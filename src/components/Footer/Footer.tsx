@@ -36,6 +36,7 @@ export function Footer() {
         <p className="footer-label">{tx(footer.follow)}</p>
         <a href="#instagram">Instagram</a>
         <a href="#facebook">Facebook</a>
+        <p className="footer-newsletter-note">{tx(content.newsletter.hook)}</p>
         <button className="button button-light button-small footer-newsletter" onClick={openNewsletter}>
           {tx(content.newsletter.button)}
         </button>

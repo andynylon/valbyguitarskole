@@ -7,7 +7,6 @@ import { readCookie, writeCookie } from "@/lib/cookies"
 import "./Prompts.scss"
 
 const GIFT_COOKIE = "vg_gift"
-const NEWSLETTER_COOKIE = "vg_newsletter"
 const COOKIE_NOTICE = "vg_cookies"
 
 function useAfter(delay: number, active: boolean, blocked: boolean) {
@@ -28,57 +27,22 @@ function useAfter(delay: number, active: boolean, blocked: boolean) {
 
 export function Prompts() {
   const { content, tx } = useText()
-  const { selectedOffer, newsletter, openBooking, openNewsletter } = useBooking()
-  const { campaignOpen } = useNotices()
+  const { selectedOffer, newsletter, openBooking } = useBooking()
+  const { campaignOpen, campaignSettled } = useNotices()
   const [giftState, setGiftState] = useState<string | null>(null)
-  const [newsletterDone, setNewsletterDone] = useState(false)
   const [cookiesAccepted, setCookiesAccepted] = useState(false)
   const [preferencesRead, setPreferencesRead] = useState(false)
-  const [giftClosedThisVisit, setGiftClosedThisVisit] = useState(false)
-  const [teaserClosed, setTeaserClosed] = useState(false)
-  const arrivedRejected = useRef(false)
+  const giftDialog = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const gift = readCookie(GIFT_COOKIE)
-    arrivedRejected.current = gift === "rejected"
-    setGiftState(gift)
-    setNewsletterDone(readCookie(NEWSLETTER_COOKIE) === "done")
+    setGiftState(readCookie(GIFT_COOKIE))
     setCookiesAccepted(readCookie(COOKIE_NOTICE) === "1")
     setPreferencesRead(true)
   }, [])
-  const returnOpened = useRef(false)
-  const sawNewsletter = useRef(false)
-  const giftDialog = useRef<HTMLDivElement>(null)
 
   const blocked = Boolean(selectedOffer || newsletter || campaignOpen)
-  const giftReady = useAfter(10_000, preferencesRead && !giftState, blocked)
+  const giftReady = useAfter(10_000, preferencesRead && !giftState && campaignSettled, blocked)
   const showGift = giftReady && !blocked && !giftState
-  const teaserReady = useAfter(
-    10_000,
-    giftClosedThisVisit && !newsletterDone && !teaserClosed,
-    blocked || showGift,
-  )
-  const showTeaser = teaserReady && !blocked && !showGift && !teaserClosed && !newsletterDone
-  const newsletterReady = useAfter(
-    5_000,
-    preferencesRead && arrivedRejected.current && !newsletterDone,
-    blocked || showGift,
-  )
-
-  useEffect(() => {
-    if (!newsletterReady || blocked || newsletterDone || returnOpened.current) return
-    returnOpened.current = true
-    openNewsletter()
-  }, [newsletterReady, blocked, newsletterDone, openNewsletter])
-
-  useEffect(() => {
-    if (newsletter) sawNewsletter.current = true
-    if (!newsletter && sawNewsletter.current) {
-      sawNewsletter.current = false
-      writeCookie(NEWSLETTER_COOKIE, "done")
-      setNewsletterDone(true)
-    }
-  }, [newsletter])
 
   useEffect(() => {
     if (!showGift) return
@@ -98,17 +62,15 @@ export function Prompts() {
   function rejectGift() {
     writeCookie(GIFT_COOKIE, "rejected")
     setGiftState("rejected")
-    setGiftClosedThisVisit(true)
   }
 
   function buyGift() {
     writeCookie(GIFT_COOKIE, "opened")
     setGiftState("opened")
-    setGiftClosedThisVisit(true)
     openBooking(tx(content.gift.bookingName))
   }
 
-  function acceptCookies() {
+  function dismissCookies() {
     writeCookie(COOKIE_NOTICE, "1")
     setCookiesAccepted(true)
   }
@@ -148,37 +110,22 @@ export function Prompts() {
           </div>
         </div>
       )}
-      {(showTeaser || !cookiesAccepted) && (
+      {preferencesRead && !cookiesAccepted && (
         <div className="prompt-dock">
-          {showTeaser && (
-            <aside className="newsletter-teaser">
-              <button
-                className="teaser-close"
-                type="button"
-                onClick={() => setTeaserClosed(true)}
-                aria-label={tx(content.newsletter.teaserClose)}
-              >
-                ×
-              </button>
-              <p className="eyebrow">{tx(content.newsletter.eyebrow)}</p>
-              <h2>{tx(content.newsletter.title)}</h2>
-              <p>{tx(content.newsletter.teaser)}</p>
-              <button className="button button-small" type="button" onClick={() => {
-                setTeaserClosed(true)
-                openNewsletter()
-              }}>
-                {tx(content.newsletter.button)} <Arrow />
-              </button>
-            </aside>
-          )}
-          {preferencesRead && !cookiesAccepted && (
-            <div className="cookie-bar" role="dialog" aria-labelledby="cookie-text">
-              <p id="cookie-text">{tx(content.cookies.text)}</p>
-              <button className="button button-small button-light" type="button" onClick={acceptCookies}>
-                {tx(content.cookies.button)}
-              </button>
-            </div>
-          )}
+          <div className="cookie-bar" role="dialog" aria-labelledby="cookie-text">
+            <button
+              className="cookie-close"
+              type="button"
+              onClick={dismissCookies}
+              aria-label={tx(content.cookies.close)}
+            >
+              ×
+            </button>
+            <p id="cookie-text">{tx(content.cookies.text)}</p>
+            <button className="button button-small button-light" type="button" onClick={dismissCookies}>
+              {tx(content.cookies.button)}
+            </button>
+          </div>
         </div>
       )}
     </>

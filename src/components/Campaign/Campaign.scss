@@ -23,24 +23,30 @@
 
   h2 {
     font-size: clamp(42px, 6vw, 56px);
+    line-height: 0.95;
     margin: 0 0 16px;
   }
 }
 
 .campaign-close {
   position: absolute;
-  right: 16px;
-  top: 10px;
+  right: 8px;
+  top: 6px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
   background: transparent;
   border: 0;
-  font: 300 30px $font-sans;
+  font: 300 30px/1 $font-sans;
   color: $cream;
 }
 
 .campaign-offer {
   background: $forest;
   color: $cream;
-  padding: 32px 36px 26px;
+  padding: 32px 72px 26px 36px;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -111,13 +117,47 @@
 }
 
 @include mobile {
-  .campaign-offer,
-  .campaign-body {
-    padding-left: 24px;
-    padding-right: 24px;
+  .campaign-backdrop {
+    padding: 12px;
+  }
+
+  .campaign {
+    max-height: calc(100vh - 24px);
+    overflow: auto;
+
+    h2 {
+      font-size: 30px;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+  }
+
+  .campaign-offer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 28px 48px 16px 20px;
   }
 
   .campaign-price {
-    font-size: 52px;
+    font-size: 36px;
+    text-align: left;
+
+    span {
+      margin-top: 4px;
+    }
+  }
+
+  .campaign-body {
+    padding: 16px 20px 14px;
+
+    > p {
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+  }
+
+  .campaign-dismiss {
+    min-height: 40px;
   }
 }
