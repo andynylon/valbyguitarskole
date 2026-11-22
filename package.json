@@ -9,6 +9,7 @@
   "engineStrict": true,
   "scripts": {
     "dev": "vite",
+    "editor": "php -S localhost:8080 -t public",
     "build": "node scripts/fetch-content.mjs && vite build && vite build --ssr src/entry-server.tsx --outDir dist/server && node scripts/prerender.mjs",
     "preview": "vite preview",
     "format": "oxfmt"

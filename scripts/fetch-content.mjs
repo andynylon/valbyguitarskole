@@ -17,8 +17,45 @@ function isContent(value) {
   )
 }
 
+function offerTone(item) {
+  if (!item || typeof item !== "object" || Array.isArray(item)) return null
+  return typeof item.tone === "string" && item.tone !== "" ? item.tone : null
+}
+
+function isOfferList(current, fallback) {
+  return (
+    fallback.length > 0 &&
+    fallback.every((item) => offerTone(item) !== null) &&
+    current.every((item) => offerTone(item) !== null)
+  )
+}
+
+function fillOfferList(current, fallback) {
+  const byTone = new Map()
+  for (const item of current) {
+    const tone = offerTone(item)
+    if (tone) byTone.set(tone, item)
+  }
+
+  const used = new Set()
+  const merged = []
+  for (const fallbackItem of fallback) {
+    const tone = offerTone(fallbackItem)
+    if (!tone) continue
+    used.add(tone)
+    const existing = byTone.get(tone)
+    merged.push(existing ? fillMissing(existing, fallbackItem) : fallbackItem)
+  }
+  for (const item of current) {
+    const tone = offerTone(item)
+    if (tone && !used.has(tone)) merged.push(item)
+  }
+  return merged
+}
+
 function fillMissing(current, fallback) {
   if (Array.isArray(current) && Array.isArray(fallback)) {
+    if (isOfferList(current, fallback)) return fillOfferList(current, fallback)
     return current.map((item, index) => {
       const fallbackItem = fallback[index]
       if (
