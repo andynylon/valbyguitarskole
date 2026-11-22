@@ -3,7 +3,7 @@
  * Copy this file on the Simply.com server to:
  *   ~/private/staging-config.php
  *
- * Staging deploys to ~/staging.valbyguitarskole.dk/, next to public_html.
+ * Staging deploys to ~/staging/, next to public_html.
  * Point the subdomain's document root at that folder.
  * Deploys do not overwrite ~/private/.
  * The hash is not the password. Create it on the server:
