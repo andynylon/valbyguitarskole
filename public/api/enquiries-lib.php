@@ -182,6 +182,25 @@ function enquiries_list(?string $status, bool $newsletterOnly = false): array
     return $statement->fetchAll();
 }
 
+function enquiries_get(int $id): ?array
+{
+    if ($id < 1) {
+        return null;
+    }
+
+    $pdo = enquiries_pdo();
+    $instrument = enquiries_ensure_column($pdo, 'instrument', "VARCHAR(80) NOT NULL DEFAULT ''")
+        ? 'instrument'
+        : "'' AS instrument";
+    $statement = $pdo->prepare(
+        'SELECT id, offer, name, email, phone, student, ' . $instrument . ' FROM enquiries WHERE id = :id'
+    );
+    $statement->execute(['id' => $id]);
+    $row = $statement->fetch();
+
+    return $row ?: null;
+}
+
 function enquiries_count_new(): int
 {
     return (int) enquiries_pdo()->query("SELECT COUNT(*) FROM enquiries WHERE status = 'new'")->fetchColumn();
