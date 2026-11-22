@@ -4,6 +4,7 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/api/content-lib.php';
 require dirname(__DIR__) . '/api/enquiries-lib.php';
 require dirname(__DIR__) . '/api/gift-lib.php';
+require dirname(__DIR__) . '/api/students-lib.php';
 
 session_start();
 header('X-Robots-Tag: noindex');
@@ -113,6 +114,19 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             $error = 'Gavekortet kunne ikke markeres som brugt.';
             error_log('Gift card redeem failed: ' . $failure->getMessage());
         }
+    } elseif (($_SESSION['editor'] ?? false) && isset($_POST['create_student'])) {
+        try {
+            $enquiry = enquiries_get((int) ($_POST['enquiry_id'] ?? 0));
+            if ($enquiry === null || (string) $enquiry['offer'] === 'Nyhedsbrev') {
+                throw new InvalidArgumentException('Enquiry cannot become a student');
+            }
+            $id = students_create_from_enquiry($enquiry);
+            header('Location: /redaktor/elever.php?id=' . $id);
+            exit;
+        } catch (Throwable $failure) {
+            $error = 'Eleven kunne ikke oprettes. Kør private/students.sql i phpMyAdmin, hvis tabellerne mangler.';
+            error_log('Student create from enquiry failed: ' . $failure->getMessage());
+        }
     } elseif (($_SESSION['editor'] ?? false) && isset($_POST['enquiry_id'], $_POST['status'])) {
         $nextFilter = (string) ($_POST['filter'] ?? '');
         if (!isset($statuses[$nextFilter])) {
@@ -134,10 +148,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 }
 
 $signedIn = (bool) ($_SESSION['editor'] ?? false);
+$studentLinks = [];
+$studentFollowups = $signedIn ? students_followup_count() : 0;
 if ($signedIn && $databaseConfigured) {
     try {
         $enquiries = enquiries_list($filter === '' ? null : $filter, $newsletterOnly);
         $newCount = enquiries_count_new();
+        $studentLinks = students_enquiry_links();
     } catch (Throwable $failure) {
         $databaseReady = false;
         if ($error === '') {
@@ -191,6 +208,7 @@ if ($signedIn && $databaseConfigured) {
     <nav>
       <a href="/redaktor/">Rediger siden</a>
       <a href="/redaktor/henvendelser.php">Henvendelser<?php if ($newCount > 0): ?> (<?= $newCount ?> nye)<?php endif; ?></a>
+      <a href="/redaktor/elever.php">Elever<?php if ($studentFollowups > 0): ?> (<?= $studentFollowups ?> opfølgning)<?php endif; ?></a>
     </nav>
   <?php endif; ?>
   <?php
@@ -260,6 +278,18 @@ if ($signedIn && $databaseConfigured) {
                 <?= htmlspecialchars((string) $enquiry['student'], ENT_QUOTES) ?>
                 <?php if (trim((string) ($enquiry['instrument'] ?? '')) !== ''): ?>
                   <div><?= htmlspecialchars((string) $enquiry['instrument'], ENT_QUOTES) ?></div>
+                <?php endif; ?>
+                <?php if ((string) $enquiry['offer'] !== 'Nyhedsbrev'): ?>
+                  <?php if (isset($studentLinks[(int) $enquiry['id']])): ?>
+                    <div><a href="/redaktor/elever.php?id=<?= $studentLinks[(int) $enquiry['id']] ?>">Elev</a></div>
+                  <?php else: ?>
+                    <form method="post">
+                      <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf'], ENT_QUOTES) ?>">
+                      <input type="hidden" name="enquiry_id" value="<?= (int) $enquiry['id'] ?>">
+                      <input type="hidden" name="filter" value="<?= htmlspecialchars($filter, ENT_QUOTES) ?>">
+                      <button type="submit" name="create_student" value="1">Opret elev</button>
+                    </form>
+                  <?php endif; ?>
                 <?php endif; ?>
                 <?php if (!empty($enquiry['rent_instrument'])): ?>
                   <div>Leje</div>
