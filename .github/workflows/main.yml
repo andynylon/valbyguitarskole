@@ -2,6 +2,8 @@ name: Publish Website
 
 on:
   push:
+    branches:
+      - main
   repository_dispatch:
     types: [content_updated]
 

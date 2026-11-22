@@ -1,0 +1,50 @@
+name: Publish Staging
+
+on:
+  push:
+    branches:
+      - staging
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  web-deploy:
+    name: Deploy Staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Latest Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.15.0
+          cache: pnpm
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Website
+        run: pnpm run build
+        env:
+          CONTENT_URL: https://valbyguitarskole.dk/api/content.php
+
+      - name: Install the staging login gate
+        run: cp deploy/staging.htaccess dist/.htaccess
+
+      - name: Deploy to Simply.com staging
+        uses: SamKirkland/web-deploy@v1
+        with:
+          target-server: ssh.simply.com
+          remote-user: valbyguitarskol.dk
+          private-ssh-key: ${{ secrets.SSH_PRIVATE_VALBYGUITARSKOLE }}
+          destination-path: ~/staging.valbyguitarskole.dk/
+          source-path: ./dist/
