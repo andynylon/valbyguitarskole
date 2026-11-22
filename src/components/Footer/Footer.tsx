@@ -40,7 +40,7 @@ export function Footer() {
           {tx(content.newsletter.button)}
         </button>
       </div>
-      <p className="copyright">© 2025 Valby Guitarskole</p>
+      <p className="copyright">© 2026 Valby Guitarskole</p>
     </footer>
   )
 }
