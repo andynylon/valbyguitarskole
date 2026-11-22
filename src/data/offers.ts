@@ -25,37 +25,37 @@ export const offers: Offer[] = [
   },
   {
     name: { da: "5 lektioner", en: "5 lessons" },
-    price: { da: "1.400 kr.", en: "DKK 1,400" },
+    price: { da: "1.500 kr.", en: "DKK 1,500" },
     text: {
       da: "Et kort forløb, når du vil i gang uden at binde dig til en hel sæson.",
       en: "A short course when you want to begin without committing to a whole season.",
     },
-    note: { da: "5 × 30 min. · Spar 100 kr.", en: "5 × 30 min. · Save DKK 100" },
+    note: { da: "5 × 30 min. · 300 kr. pr. lektion", en: "5 × 30 min. · DKK 300 per lesson" },
     tone: "yellow",
   },
   {
     name: { da: "10 lektioner", en: "10 lessons" },
-    price: { da: "2.750 kr.", en: "DKK 2,750" },
+    price: { da: "2.850 kr.", en: "DKK 2,850" },
     text: {
       da: "Til dig, der vil skabe momentum og mærke tydelig udvikling.",
       en: "For players who want to build momentum and make clear progress.",
     },
     note: {
-      da: "10 × 30 min. · Spar 250 kr.",
-      en: "10 × 30 min. · Save DKK 250",
+      da: "10 × 30 min. · Spar 150 kr.",
+      en: "10 × 30 min. · Save DKK 150",
     },
     tone: "coral",
   },
   {
     name: { da: "Halvt år", en: "Six months" },
-    price: { da: "5.100 kr.", en: "DKK 5,100" },
+    price: { da: "5.750 kr.", en: "DKK 5,750" },
     text: {
       da: "Fast ugentlig tid og et personligt forløb gennem hele sæsonen.",
       en: "A fixed weekly time and a personal course throughout the season.",
     },
     note: {
-      da: "20 × 30 min. · 850 kr./md. i 6 mdr.",
-      en: "20 × 30 min. · DKK 850/month for 6 months",
+      da: "20 × 30 min. · Spar 250 kr.",
+      en: "20 × 30 min. · Save DKK 250",
     },
     tone: "green",
   },

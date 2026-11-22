@@ -10,9 +10,9 @@ import "./BookingModal.scss"
 
 const giftCourses = [
   { offer: "Prøvetime", da: "1 lektion", en: "1 lesson", price: { da: "300 kr.", en: "DKK 300" } },
-  { offer: "5 lektioner", da: "5 lektioner", en: "5 lessons", price: { da: "1.400 kr.", en: "DKK 1,400" } },
-  { offer: "10 lektioner", da: "10 lektioner", en: "10 lessons", price: { da: "2.750 kr.", en: "DKK 2,750" } },
-  { offer: "Halvt år", da: "20 lektioner", en: "20 lessons", price: { da: "5.100 kr.", en: "DKK 5,100" } },
+  { offer: "5 lektioner", da: "5 lektioner", en: "5 lessons", price: { da: "1.500 kr.", en: "DKK 1,500" } },
+  { offer: "10 lektioner", da: "10 lektioner", en: "10 lessons", price: { da: "2.850 kr.", en: "DKK 2,850" } },
+  { offer: "Halvt år", da: "20 lektioner", en: "20 lessons", price: { da: "5.750 kr.", en: "DKK 5,750" } },
 ]
 
 function giftPackages(content: SiteContent, language: Language) {

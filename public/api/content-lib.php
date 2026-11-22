@@ -108,11 +108,77 @@ function content_fill_missing(array $content): array
     return content_fill_missing_keys($content, $defaults);
 }
 
+function content_offer_tone(mixed $item): ?string
+{
+    if (!is_array($item) || array_is_list($item)) {
+        return null;
+    }
+    $tone = $item['tone'] ?? null;
+
+    return is_string($tone) && $tone !== '' ? $tone : null;
+}
+
+function content_is_offer_list(array $current, array $defaults): bool
+{
+    if ($defaults === [] || !array_is_list($current) || !array_is_list($defaults)) {
+        return false;
+    }
+    foreach ($defaults as $item) {
+        if (content_offer_tone($item) === null) {
+            return false;
+        }
+    }
+    foreach ($current as $item) {
+        if (content_offer_tone($item) === null) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function content_fill_offer_list(array $current, array $defaults): array
+{
+    $byTone = [];
+    foreach ($current as $item) {
+        $tone = content_offer_tone($item);
+        if ($tone !== null) {
+            $byTone[$tone] = $item;
+        }
+    }
+
+    $merged = [];
+    $used = [];
+    foreach ($defaults as $fallbackItem) {
+        $tone = content_offer_tone($fallbackItem);
+        if ($tone === null || !is_array($fallbackItem)) {
+            continue;
+        }
+        $used[$tone] = true;
+        $existing = $byTone[$tone] ?? null;
+        $merged[] = is_array($existing)
+            ? content_fill_missing_keys($existing, $fallbackItem)
+            : $fallbackItem;
+    }
+    foreach ($current as $item) {
+        $tone = content_offer_tone($item);
+        if ($tone !== null && !isset($used[$tone])) {
+            $merged[] = $item;
+        }
+    }
+
+    return $merged;
+}
+
 function content_fill_missing_keys(array $content, array $defaults): array
 {
     foreach ($defaults as $key => $value) {
         if (!array_key_exists($key, $content)) {
             $content[$key] = $value;
+            continue;
+        }
+        if (is_array($value) && is_array($content[$key]) && content_is_offer_list($content[$key], $value)) {
+            $content[$key] = content_fill_offer_list($content[$key], $value);
             continue;
         }
         if (is_array($value) && is_array($content[$key]) && array_is_list($value) && array_is_list($content[$key])) {
