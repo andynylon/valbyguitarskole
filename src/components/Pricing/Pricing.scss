@@ -140,10 +140,11 @@
 }
 
 .group-class {
-  max-width: 1300px;
-  margin: 28px auto 0;
-  background: $ivory;
-  border: 1px solid rgb(24 54 47 / 18%);
+  max-width: 1180px;
+  margin: 64px auto 0;
+  text-align: left;
+  background: $green;
+  color: $ivory;
   padding: 34px 40px;
   display: grid;
   grid-template-columns: 78px 1fr auto;
@@ -152,13 +153,13 @@
 
   .eyebrow {
     margin-bottom: 10px;
-    color: $coral-deep;
+    color: $yellow;
   }
 
   h3 {
     margin: 0 0 8px;
     font: italic 32px $font-serif;
-    color: $ink;
+    color: $ivory;
   }
 
   p {
@@ -166,12 +167,12 @@
     max-width: 640px;
     font-size: 14px;
     line-height: 1.7;
-    color: $muted-soft;
+    color: rgb(255 248 231 / 78%);
   }
 
   .offer-note {
     margin: 0;
-    color: $ink;
+    color: $ivory;
   }
 
   @include tablet {
@@ -189,9 +190,9 @@
   height: 78px;
   display: grid;
   place-items: center;
-  border: 1px solid rgb(24 54 47 / 22%);
+  border: 1px solid rgb(255 248 231 / 40%);
   border-radius: 50%;
-  color: $forest;
+  color: $ivory;
   font: italic 34px $font-serif;
 
   @include mobile {
