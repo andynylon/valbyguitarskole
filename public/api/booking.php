@@ -43,8 +43,11 @@ $student = $signup ? '' : field($payload, 'student', 200);
 $instrument = $signup ? '' : field($payload, 'instrument', 80);
 $recipient = field($payload, 'recipient', 200);
 $greeting = note_field($payload, 'greeting', 500);
+$message = note_field($payload, 'message', 1000);
 $language = field($payload, 'language', 2) === 'en' ? 'en' : 'da';
 $gift = !$signup && gift_is_offer($offer);
+$classSize = booking_class_size($payload, $signup, $gift);
+$offer = booking_with_class($offer, $classSize, $language);
 $newsletter = $signup || (($payload['newsletter'] ?? false) === true);
 $rental = !$signup && (($payload['rental'] ?? false) === true);
 
@@ -66,6 +69,7 @@ $enquiry = [
     'newsletter' => $newsletter,
     'recipient' => $gift ? $recipient : '',
     'greeting' => $gift ? $greeting : '',
+    'message' => $message,
 ];
 
 $saved = false;
@@ -84,7 +88,7 @@ $configFile = dirname(__DIR__, 2) . '/private/mail-config.php';
 $config = is_file($configFile) ? require $configFile : null;
 if (is_array($config) && isset($config['username'], $config['password'], $config['from'], $config['to'])) {
     $subject = $signup ? 'Ny tilmelding til nyhedsbrev' : (($gift ? 'Nyt gavekort: ' : 'Ny forespørgsel: ') . $offer);
-    $body = enquiryMail($gift, $offer, $name, $email, $phone, $student, $instrument, $rental, $recipient, $greeting, $enquiryId, $newsletter);
+    $body = enquiryMail($gift, $offer, $name, $email, $phone, $student, $instrument, $rental, $recipient, $greeting, $enquiryId, $newsletter, $classSize, $message);
 
     try {
         $from = (string) $config['from'];
@@ -140,7 +144,9 @@ function enquiryMail(
     string $recipient,
     string $greeting,
     int $enquiryId,
-    bool $newsletter
+    bool $newsletter,
+    int $classSize,
+    string $message
 ): string {
     $sans = mail_sans();
     $labelStyle = 'padding:9px 16px 9px 0;border-bottom:1px solid #eadfcd;font-family:' . $sans . ';font-size:12px;line-height:1.4;letter-spacing:0.04em;text-transform:uppercase;color:#da5944;vertical-align:top;';
@@ -155,6 +161,9 @@ function enquiryMail(
     }
     if ($detail !== '') {
         $rows[] = ['Detalje', mail_esc($detail)];
+    }
+    if (!$gift && $offer !== 'Nyhedsbrev') {
+        $rows[] = ['Undervisning', booking_class_mail_label($classSize)];
     }
     if ($instrument !== '') {
         $rows[] = ['Instrument', mail_esc($instrument)];
@@ -171,6 +180,9 @@ function enquiryMail(
         if ($enquiryId > 0) {
             $rows[] = ['Reference', mail_esc(gift_reference($enquiryId))];
         }
+    }
+    if ($message !== '') {
+        $rows[] = ['Andet', mail_lines($message, 'margin:0 0 8px;font-family:' . $sans . ';font-size:15px;line-height:1.45;color:#18362f;')];
     }
 
     $table = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">';
@@ -229,6 +241,71 @@ function newsletterReply(string $name, string $language): array
         . mail_signoff(false);
 
     return ['Du er tilmeldt nyhedsbrevet', mail_shell('da', mail_card($body))];
+}
+
+function booking_class_size(array $payload, bool $signup, bool $gift): int
+{
+    if ($signup || $gift) {
+        return 1;
+    }
+    $size = (int) ($payload['classSize'] ?? 1);
+
+    return $size === 2 || $size === 3 ? $size : 1;
+}
+
+function booking_class_mail_label(int $classSize): string
+{
+    if ($classSize === 3) {
+        return 'Hold på tre · 60 min.';
+    }
+    if ($classSize === 2) {
+        return 'Hold på to · 45 min.';
+    }
+
+    return 'Enkeltundervisning';
+}
+
+function booking_class_label(int $classSize, string $language): string
+{
+    if ($classSize === 3) {
+        return $language === 'en' ? 'Group of three' : 'Hold på tre';
+    }
+    if ($classSize === 2) {
+        return $language === 'en' ? 'Group of two' : 'Hold på to';
+    }
+
+    return $language === 'en' ? 'One-to-one' : 'Enkeltundervisning';
+}
+
+function booking_strip_group(string $offer): string
+{
+    $trimmed = preg_replace(
+        '/(?:^|\s*·\s*)(hold på (to|tre|fire)|group of (two|three)|group class of four)\s*$/iu',
+        '',
+        $offer
+    );
+
+    return trim(is_string($trimmed) ? $trimmed : $offer);
+}
+
+function booking_with_class(string $offer, int $classSize, string $language): string
+{
+    $base = booking_strip_group($offer);
+    if ($classSize === 1) {
+        if ($base === $offer) {
+            return $offer;
+        }
+        if ($base === '') {
+            return booking_class_label(1, $language);
+        }
+
+        return $base;
+    }
+    if ($base === '') {
+        return booking_class_label($classSize, $language);
+    }
+
+    return $base . ' · ' . booking_class_label($classSize, $language);
 }
 
 function field(array $payload, string $key, int $max): string

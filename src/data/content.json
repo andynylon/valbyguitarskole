@@ -237,8 +237,8 @@
       "en": "On your terms."
     },
     "intro": {
-      "da": "Alle forløb er 1:1-undervisning og tilpasses dit niveau, din musiksmag og det, du gerne vil kunne. Alle priser er for lektioner på 30 minutter.",
-      "en": "Every course is taught one-to-one and tailored to your level, musical taste and goals. All prices are for 30-minute lessons."
+      "da": "Forløbene herunder er 1:1-undervisning og tilpasses dit niveau, din musiksmag og det, du gerne vil kunne. Alle priser er for lektioner på 30 minutter. Et hold på to varer 45 minutter, og et hold på tre varer 60 minutter.",
+      "en": "The courses below are taught one-to-one and tailored to your level, musical taste and goals. All prices are for 30-minute lessons. A class of two lasts 45 minutes, and a class of three lasts 60 minutes."
     },
     "choose": {
       "da": "Vælg",
@@ -321,7 +321,41 @@
         },
         "tone": "green"
       }
-    ]
+    ],
+    "group": {
+      "eyebrow": {
+        "da": "Holdundervisning",
+        "en": "Group lessons"
+      },
+      "title": {
+        "da": "Et hold på to",
+        "en": "A class of two"
+      },
+      "text": {
+        "da": "Spil sammen med én anden. To elever og én underviser, samlet efter instrument og niveau. Et hold på to varer 45 minutter. Er I tre, varer lektionen 60 minutter.",
+        "en": "Play with one other person. Two students and one teacher, matched by instrument and level. A class of two lasts 45 minutes. A class of three lasts 60 minutes."
+      },
+      "note": {
+        "da": "2 elever · 45 min.",
+        "en": "2 students · 45 min."
+      },
+      "noteThree": {
+        "da": "3 elever · 60 min.",
+        "en": "3 students · 60 min."
+      },
+      "button": {
+        "da": "Book et hold",
+        "en": "Book a group class"
+      },
+      "bookingName": {
+        "da": "Hold på to",
+        "en": "Group of two"
+      },
+      "formIntro": {
+        "da": "Et hold på to varer 45 minutter. Et hold på tre varer 60 minutter. Du betaler først, når tiden er aftalt.",
+        "en": "A class of two lasts 45 minutes. A class of three lasts 60 minutes. You only pay once a time has been agreed."
+      }
+    }
   },
   "gift": {
     "eyebrow": {
@@ -511,8 +545,8 @@
           "en": "Attentive"
         },
         "text": {
-          "da": "Én elev, én underviser, fuldt fokus.",
-          "en": "One student, one teacher, complete focus."
+          "da": "Enkeltundervisning med fuldt fokus — eller et hold på to.",
+          "en": "One-to-one teaching with complete focus — or a class of two."
         }
       },
       {

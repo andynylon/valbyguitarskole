@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS students (
     instrument VARCHAR(80) NOT NULL DEFAULT '',
     status ENUM('trial', 'active', 'pause', 'finished') NOT NULL DEFAULT 'active',
     plan ENUM('none', 'trial', 'card5', 'card10', 'halfyear') NOT NULL DEFAULT 'none',
+    class_size TINYINT UNSIGNED NOT NULL DEFAULT 1,
     lessons_total INT UNSIGNED NOT NULL DEFAULT 0,
     lessons_used INT UNSIGNED NOT NULL DEFAULT 0,
     weekday TINYINT UNSIGNED NULL,

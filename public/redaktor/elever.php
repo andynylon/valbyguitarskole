@@ -262,7 +262,7 @@ $eventKinds = [
         <?= htmlspecialchars((string) $student['attention']['detail'], ENT_QUOTES) ?>
       </p>
     <?php endif; ?>
-    <p class="muted"><?= htmlspecialchars(students_slot($student), ENT_QUOTES) ?> · <?= max(0, students_remaining($student)) ?> lektioner tilbage</p>
+    <p class="muted"><?= htmlspecialchars(students_slot($student), ENT_QUOTES) ?> · <?= max(0, students_remaining($student)) ?> lektioner tilbage · <?= htmlspecialchars(students_class_sizes()[students_class_size((string) ($student['class_size'] ?? 1))], ENT_QUOTES) ?></p>
     <div class="split">
       <form class="panel" method="post">
         <h2>Elev</h2>
@@ -285,6 +285,13 @@ $eventKinds = [
             <select name="plan">
               <?php foreach (students_plans() as $value => $label): ?>
                 <option value="<?= htmlspecialchars($value, ENT_QUOTES) ?>"<?= $student['plan'] === $value ? ' selected' : '' ?>><?= htmlspecialchars($label, ENT_QUOTES) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </label>
+          <label>Undervisning
+            <select name="class_size">
+              <?php foreach (students_class_sizes() as $value => $label): ?>
+                <option value="<?= $value ?>"<?= students_class_size((string) ($student['class_size'] ?? 1)) === $value ? ' selected' : '' ?>><?= htmlspecialchars($label, ENT_QUOTES) ?></option>
               <?php endforeach; ?>
             </select>
           </label>
@@ -395,7 +402,13 @@ $eventKinds = [
             <?php $remaining = students_remaining($row); ?>
             <tr>
               <td><a href="/redaktor/elever.php?id=<?= (int) $row['id'] ?><?= $filter !== '' ? '&filter=' . rawurlencode($filter) : '' ?>"><?= htmlspecialchars((string) $row['name'], ENT_QUOTES) ?></a></td>
-              <td><?= htmlspecialchars(students_plans()[(string) $row['plan']] ?? '', ENT_QUOTES) ?></td>
+              <td>
+                <?= htmlspecialchars(students_plans()[(string) $row['plan']] ?? '', ENT_QUOTES) ?>
+                <?php $classSize = students_class_size((string) ($row['class_size'] ?? 1)); ?>
+                <?php if ($classSize > 1): ?>
+                  <div class="muted"><?= htmlspecialchars(students_class_sizes()[$classSize], ENT_QUOTES) ?></div>
+                <?php endif; ?>
+              </td>
               <td><?= htmlspecialchars(students_slot($row), ENT_QUOTES) ?></td>
               <td><?= max(0, $remaining) ?><?php if ($row['period_end']): ?><div class="muted">til <?= htmlspecialchars((string) $row['period_end'], ENT_QUOTES) ?></div><?php endif; ?></td>
               <td><?= htmlspecialchars(students_statuses()[(string) $row['status']] ?? '', ENT_QUOTES) ?></td>
@@ -430,6 +443,13 @@ $eventKinds = [
           <select name="plan">
             <?php foreach (students_plans() as $value => $label): ?>
               <option value="<?= htmlspecialchars($value, ENT_QUOTES) ?>"><?= htmlspecialchars($label, ENT_QUOTES) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </label>
+        <label>Undervisning
+          <select name="class_size">
+            <?php foreach (students_class_sizes() as $value => $label): ?>
+              <option value="<?= $value ?>"><?= htmlspecialchars($label, ENT_QUOTES) ?></option>
             <?php endforeach; ?>
           </select>
         </label>

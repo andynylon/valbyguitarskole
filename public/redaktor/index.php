@@ -113,6 +113,8 @@ function editor_label(string $key): string
         'options' => 'Instrumenter',
         'choose' => 'Vælg-tekst',
         'offers' => 'Forløb',
+        'group' => 'Holdundervisning',
+        'noteThree' => 'Note, hold på tre',
         'bookingName' => 'Navn i booking',
         'dismiss' => 'Afvis-knap',
         'close' => 'Luk-knap',

@@ -31,12 +31,17 @@ export function BookingModal() {
   const [error, setError] = useState(false)
   const [studentChoice, setStudentChoice] = useState("")
   const [instrumentChoice, setInstrumentChoice] = useState("")
+  const [classSize, setClassSize] = useState("1")
+
+  const groupNames = content.pricing.group.bookingName
+  const groupOffer = selectedOffer === groupNames.da || selectedOffer === groupNames.en
 
   useEffect(() => {
     setStudentChoice("")
     setInstrumentChoice("")
+    setClassSize(groupOffer ? "2" : "1")
     setError(false)
-  }, [selectedOffer, newsletter])
+  }, [selectedOffer, newsletter, groupOffer])
 
   if (!selectedOffer && !newsletter) return null
 
@@ -53,6 +58,7 @@ export function BookingModal() {
     setError(false)
 
     const student = String(form.get("student") ?? "")
+    const chosenClass = Number(form.get("classSize") ?? 1)
 
     try {
       const response = await fetch("/api/booking.php", {
@@ -66,11 +72,13 @@ export function BookingModal() {
           email: form.get("email"),
           phone: form.get("phone"),
           student,
+          classSize: chosenClass === 2 || chosenClass === 3 ? chosenClass : 1,
           instrument: form.get("instrument"),
           rental: form.get("rental") === "yes",
           newsletter: newsletter || form.get("newsletter") === "yes",
           recipient: giftCard ? form.get("recipient") : "",
           greeting: giftCard ? form.get("greeting") : "",
+          message: form.get("message"),
           company: form.get("company"),
         }),
       })
@@ -158,7 +166,9 @@ export function BookingModal() {
                         "Vælg et forløb, en modtager og en kort hilsen. Du får en mail med betalingsoplysninger. Gavekortet sendes, når betalingen er gået ind.",
                         "Choose a course, a recipient and a short greeting. You will get an email with payment details. The gift card is sent once the payment has arrived.",
                       )
-                    : t(
+                    : groupOffer
+                      ? tx(content.pricing.group.formIntro)
+                      : t(
                         "Udfyld dine oplysninger, så kontakter vi dig og finder den helt rigtige løsning. Du betaler først, når tiden er aftalt.",
                         "Fill in your details and we will contact you to find the right solution. You only pay once a time has been agreed.",
                       )}
@@ -189,6 +199,21 @@ export function BookingModal() {
                     {t("Telefon", "Phone")}
                     <input type="tel" name="phone" required placeholder="+45 12 34 56 78" />
                   </label>
+                  {!giftCard && (
+                    <label>
+                      {t("Undervisning", "Lessons")}
+                      <select
+                        name="classSize"
+                        value={classSize}
+                        required
+                        onChange={(event) => setClassSize(event.target.value)}
+                      >
+                        <option value="1">{t("Enkeltundervisning", "One-to-one")}</option>
+                        <option value="2">{t("Hold på to · 45 min.", "Group of two · 45 min.")}</option>
+                        <option value="3">{t("Hold på tre · 60 min.", "Group of three · 60 min.")}</option>
+                      </select>
+                    </label>
+                  )}
                   <label>
                     {giftCard ? t("Forløb", "Course") : t("Hvem skal spille?", "Who will be playing?")}
                     <select
@@ -260,6 +285,18 @@ export function BookingModal() {
                   </label>
                 </>
               )}
+              <label className="span-2">
+                {t("Noget andet", "Anything else")}
+                <textarea
+                  name="message"
+                  maxLength={1000}
+                  rows={3}
+                  placeholder={t(
+                    "Spørgsmål, kommentarer eller andet",
+                    "Questions, comments or anything else",
+                  )}
+                />
+              </label>
               <p className="form-note">
                 {newsletter
                   ? tx(newsletterCopy.note)
