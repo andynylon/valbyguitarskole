@@ -592,21 +592,25 @@
       "da": "Tilmeld nyhedsbrev",
       "en": "Join the newsletter"
     },
+    "hook": {
+      "da": "Grundlagt her i Valby. Få besked, når huset holder koncerter og små aftener.",
+      "en": "Founded here in Valby. Hear when the house has concerts and small evenings."
+    },
     "eyebrow": {
-      "da": "Nyhedsbrev",
-      "en": "Newsletter"
+      "da": "Lokalt grundlagt",
+      "en": "Locally founded"
     },
     "title": {
-      "da": "Få nyt fra skolen.",
-      "en": "News from the school."
+      "da": "Med til det, der sker.",
+      "en": "In on what happens."
     },
     "intro": {
-      "da": "Korte mails om koncerter, ledige tider og livet i huset. Du kan altid framelde dig.",
-      "en": "Short emails about concerts, open times and life in the house. You can unsubscribe at any time."
+      "da": "Skolen er startet her i kvarteret. Korte mails om koncerter, små aftener og ledige tider — kun når der er noget at fortælle. Du kan altid framelde dig.",
+      "en": "The school started here in the neighbourhood. Short emails about concerts, small evenings and open times — only when there is something to tell. You can unsubscribe at any time."
     },
     "checkbox": {
-      "da": "Ja tak, send mig også nyhedsbrevet.",
-      "en": "Yes, send me the newsletter too."
+      "da": "Ja tak — skriv når det lokale hus holder koncerter og aftener.",
+      "en": "Yes — write when the local house has concerts and evenings."
     },
     "note": {
       "da": "Vi bruger din e-mail til nyhedsbrevet og ikke til andet.",
@@ -621,12 +625,12 @@
       "en": "You are signed up."
     },
     "successText": {
-      "da": "Vi skriver, når der er nyt fra skolen.",
-      "en": "We will write when there is news from the school."
+      "da": "Vi skriver, når huset har koncerter, aftener eller ledige tider.",
+      "en": "We will write when the house has concerts, evenings or open times."
     },
     "teaser": {
-      "da": "Korte mails, når der er koncerter og ledige tider.",
-      "en": "Short emails when there are concerts and open times."
+      "da": "Grundlagt her i Valby. Koncerter, små aftener og ledige tider.",
+      "en": "Founded here in Valby. Concerts, small evenings and open times."
     },
     "teaserClose": {
       "da": "Luk",
@@ -637,20 +641,20 @@
     "active": "ja",
     "until": "2026-11-30",
     "eyebrow": {
-      "da": "Black Friday",
-      "en": "Black Friday"
+      "da": "Musik i gave",
+      "en": "The gift of music"
     },
     "titleLine1": {
-      "da": "En prøvetime.",
-      "en": "A trial lesson."
+      "da": "Giv dig selv",
+      "en": "Give yourself"
     },
     "titleLine2": {
-      "da": "Til halv pris.",
-      "en": "At half price."
+      "da": "den første time.",
+      "en": "the first lesson."
     },
     "text": {
-      "da": "I Black Friday-ugen koster prøvetimen det halve. 30 minutter for 150 kr., ingen binding — mærk efter, om skolen er noget for dig.",
-      "en": "During Black Friday week the trial lesson is half price. 30 minutes for DKK 150, no commitment — see whether the school is right for you."
+      "da": "Prøvetimen koster 150 kr. denne uge, halvdelen af prisen. 30 minutter og ingen binding — mærk efter, om skolen er noget for dig.",
+      "en": "The trial lesson is DKK 150 this week, half the price. 30 minutes and no commitment — see whether the school is right for you."
     },
     "price": {
       "da": "150 kr.",
@@ -673,26 +677,30 @@
       "en": "Close offer"
     },
     "bookingName": {
-      "da": "Black Friday · halv pris",
-      "en": "Black Friday · half price"
+      "da": "Prøvetime · halv pris",
+      "en": "Trial lesson · half price"
     },
     "formTitle": {
       "da": "Book prøvetimen.",
       "en": "Book the trial lesson."
     },
     "formIntro": {
-      "da": "Prøvetimen koster 150 kr. i Black Friday-ugen, halvdelen af normalprisen. Udfyld dine oplysninger, så finder vi en tid. Der er ingen binding.",
-      "en": "The trial lesson is DKK 150 during Black Friday week, half the usual price. Leave your details and we will find a time. There is no commitment."
+      "da": "Prøvetimen koster 150 kr. denne uge, halvdelen af normalprisen. Udfyld dine oplysninger, så finder vi en tid. Der er ingen binding.",
+      "en": "The trial lesson is DKK 150 this week, half the usual price. Leave your details and we will find a time. There is no commitment."
     }
   },
   "cookies": {
     "text": {
-      "da": "Vi gemmer en cookie, så vi husker, hvis du lukker gavekortet eller nyhedsbrevet. Så viser vi det ikke igen.",
-      "en": "We store a cookie so we remember if you close the gift card or the newsletter. Then we will not show it again."
+      "da": "Vi gemmer en cookie, så vi husker, hvis du lukker gavekortet eller tilbuddet. Så viser vi det ikke igen.",
+      "en": "We store a cookie so we remember if you close the gift card or the offer. Then we will not show it again."
     },
     "button": {
       "da": "Det er fint",
       "en": "That's fine"
+    },
+    "close": {
+      "da": "Luk",
+      "en": "Close"
     }
   },
   "footer": {

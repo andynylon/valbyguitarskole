@@ -5,7 +5,8 @@ import { useNotices } from "@/context/NoticeContext"
 import { Arrow } from "@/components/icons/Arrow"
 import "./Campaign.scss"
 
-const STORAGE_KEY = "vg-campaign-black-friday-2026-half"
+const STORAGE_KEY = "vg-campaign-music-gift-2026"
+const SHOW_DELAY = 15_000
 
 function campaignIsCurrent(active: string, until: string) {
   if (active.trim().toLowerCase() !== "ja") return false
@@ -33,7 +34,7 @@ function alreadyDismissed() {
 export function Campaign() {
   const { content, tx } = useText()
   const { selectedOffer, newsletter, openBooking } = useBooking()
-  const { setCampaignOpen } = useNotices()
+  const { setCampaignOpen, setCampaignSettled } = useNotices()
   const campaign = content.campaign
   const current = campaignIsCurrent(campaign.active, campaign.until)
   const [visible, setVisible] = useState(false)
@@ -50,10 +51,13 @@ export function Campaign() {
   }, [selectedOffer, newsletter])
 
   useEffect(() => {
-    if (!current || alreadyDismissed() || skipped.current || selectedOffer || newsletter) return
-    const timer = window.setTimeout(() => setVisible(true), 800)
+    if (!current || alreadyDismissed() || skipped.current || selectedOffer || newsletter) {
+      if (!current || alreadyDismissed() || skipped.current) setCampaignSettled(true)
+      return
+    }
+    const timer = window.setTimeout(() => setVisible(true), SHOW_DELAY)
     return () => window.clearTimeout(timer)
-  }, [current, selectedOffer, newsletter])
+  }, [current, selectedOffer, newsletter, setCampaignSettled])
 
   useEffect(() => {
     if (!visible) return
@@ -63,6 +67,7 @@ export function Campaign() {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         rememberDismissal()
+        setCampaignSettled(true)
         setVisible(false)
       }
     }
@@ -77,11 +82,13 @@ export function Campaign() {
 
   const close = () => {
     rememberDismissal()
+    setCampaignSettled(true)
     setVisible(false)
   }
 
   const book = () => {
     rememberDismissal()
+    setCampaignSettled(true)
     setVisible(false)
     openBooking(tx(campaign.bookingName))
   }

@@ -27,9 +27,12 @@ export function Contact() {
           >
             {tx(contact.button)} <Arrow />
           </button>
-          <button className="button button-ghost" onClick={openNewsletter}>
-            {tx(content.newsletter.button)}
-          </button>
+          <div className="contact-newsletter">
+            <p>{tx(content.newsletter.hook)}</p>
+            <button className="button button-ghost" onClick={openNewsletter}>
+              {tx(content.newsletter.button)}
+            </button>
+          </div>
         </div>
       </div>
     </section>
