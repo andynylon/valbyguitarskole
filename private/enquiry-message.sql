@@ -1,0 +1,2 @@
+ALTER TABLE enquiries
+    ADD COLUMN message VARCHAR(1000) NOT NULL DEFAULT '';

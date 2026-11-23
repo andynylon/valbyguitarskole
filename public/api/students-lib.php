@@ -14,6 +14,35 @@ function students_plans(): array
     ];
 }
 
+function students_class_sizes(): array
+{
+    return [
+        1 => 'Enkeltundervisning',
+        2 => 'Hold på to · 45 min.',
+        3 => 'Hold på tre · 60 min.',
+    ];
+}
+
+function students_class_size(string $value): int
+{
+    $size = (int) $value;
+
+    return $size === 2 || $size === 3 ? $size : 1;
+}
+
+function students_offer_class_size(string $offer): int
+{
+    $name = strtolower($offer);
+    if (str_contains($name, 'hold på tre') || str_contains($name, 'group of three')) {
+        return 3;
+    }
+    if (str_contains($name, 'hold på to') || str_contains($name, 'group of two')) {
+        return 2;
+    }
+
+    return 1;
+}
+
 function students_statuses(): array
 {
     return [
@@ -59,6 +88,7 @@ function students_install(PDO $pdo): void
             instrument VARCHAR(80) NOT NULL DEFAULT '',
             status ENUM('trial', 'active', 'pause', 'finished') NOT NULL DEFAULT 'active',
             plan ENUM('none', 'trial', 'card5', 'card10', 'halfyear') NOT NULL DEFAULT 'none',
+            class_size TINYINT UNSIGNED NOT NULL DEFAULT 1,
             lessons_total INT UNSIGNED NOT NULL DEFAULT 0,
             lessons_used INT UNSIGNED NOT NULL DEFAULT 0,
             weekday TINYINT UNSIGNED NULL,
@@ -87,7 +117,35 @@ function students_install(PDO $pdo): void
             KEY student_events_student (student_id, happened_on)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
     );
+    students_class_size_ready($pdo);
     $done = true;
+}
+
+function students_class_size_ready(PDO $pdo): bool
+{
+    static $ready = null;
+    if ($ready !== null) {
+        return $ready;
+    }
+
+    $found = $pdo->query("SHOW COLUMNS FROM students LIKE 'class_size'")->fetch();
+    if ($found) {
+        $ready = true;
+
+        return true;
+    }
+
+    try {
+        $pdo->exec('ALTER TABLE students ADD COLUMN class_size TINYINT UNSIGNED NOT NULL DEFAULT 1 AFTER plan');
+        $ready = true;
+
+        return true;
+    } catch (Throwable $error) {
+        error_log('Student class size column missing: ' . $error->getMessage());
+        $ready = false;
+
+        return false;
+    }
 }
 
 function students_pdo(): PDO
@@ -430,13 +488,10 @@ function students_create(array $fields): int
         $fields['period_end'] = $today->modify('+6 months')->format('Y-m-d');
     }
     $today = $today->format('Y-m-d');
-    $statement = $pdo->prepare(
-        'INSERT INTO students
-            (enquiry_id, name, email, phone, instrument, status, plan, lessons_total, lessons_used, weekday, lesson_time, period_start, period_end, note)
-         VALUES
-            (:enquiry_id, :name, :email, :phone, :instrument, :status, :plan, :lessons_total, 0, :weekday, :lesson_time, :period_start, :period_end, :note)'
-    );
-    $statement->execute([
+    $classSize = students_class_size((string) ($fields['class_size'] ?? '1'));
+    $columns = 'enquiry_id, name, email, phone, instrument, status, plan, lessons_total, lessons_used, weekday, lesson_time, period_start, period_end, note';
+    $placeholders = ':enquiry_id, :name, :email, :phone, :instrument, :status, :plan, :lessons_total, 0, :weekday, :lesson_time, :period_start, :period_end, :note';
+    $values = [
         'enquiry_id' => $enquiryId > 0 ? $enquiryId : null,
         'name' => $name,
         'email' => $email,
@@ -450,16 +505,25 @@ function students_create(array $fields): int
         'period_start' => $fields['period_start'] ?? null,
         'period_end' => $fields['period_end'] ?? null,
         'note' => students_text((string) ($fields['note'] ?? ''), 2000),
-    ]);
-    $id = (int) $pdo->lastInsertId();
-    students_event(
-        $pdo,
-        $id,
-        'signup',
-        'Elev oprettet',
-        students_plans()[$plan] . ((string) ($fields['history'] ?? '') !== '' ? ' · ' . (string) $fields['history'] : ''),
-        $today
+    ];
+    if (students_class_size_ready($pdo)) {
+        $columns .= ', class_size';
+        $placeholders .= ', :class_size';
+        $values['class_size'] = $classSize;
+    }
+    $statement = $pdo->prepare(
+        'INSERT INTO students (' . $columns . ') VALUES (' . $placeholders . ')'
     );
+    $statement->execute($values);
+    $id = (int) $pdo->lastInsertId();
+    $signup = students_plans()[$plan];
+    if ($classSize > 1) {
+        $signup .= ' · ' . students_class_sizes()[$classSize];
+    }
+    if ((string) ($fields['history'] ?? '') !== '') {
+        $signup .= ' · ' . (string) $fields['history'];
+    }
+    students_event($pdo, $id, 'signup', 'Elev oprettet', $signup, $today);
 
     return $id;
 }
@@ -491,9 +555,11 @@ function students_create_from_enquiry(array $enquiry): int
             'instrument' => (string) ($enquiry['instrument'] ?? ''),
             'status' => $offer['status'],
             'plan' => $offer['plan'],
+            'class_size' => students_offer_class_size((string) $enquiry['offer']),
             'lessons_total' => $offer['lessons'],
             'period_start' => $start,
             'period_end' => $end,
+            'note' => (string) ($enquiry['message'] ?? ''),
             'history' => $history,
         ]);
     } catch (PDOException $error) {
@@ -520,6 +586,7 @@ function students_input(array $input): array
         'instrument' => students_text((string) ($input['instrument'] ?? ''), 80),
         'status' => $status,
         'plan' => $plan,
+        'class_size' => students_class_size((string) ($input['class_size'] ?? '1')),
         'lessons_total' => students_count((string) ($input['lessons_total'] ?? '0')),
         'lessons_used' => students_count((string) ($input['lessons_used'] ?? '0')),
         'weekday' => students_weekday((string) ($input['weekday'] ?? '')),
@@ -541,15 +608,22 @@ function students_save(int $id, array $input): void
         throw new InvalidArgumentException('Student name and email are required');
     }
     $pdo = students_pdo();
-    $statement = $pdo->prepare(
-        'UPDATE students SET
+    $classSizeReady = students_class_size_ready($pdo);
+    $sql = 'UPDATE students SET
             name = :name, email = :email, phone = :phone, instrument = :instrument,
             status = :status, plan = :plan, lessons_total = :lessons_total, lessons_used = :lessons_used,
             weekday = :weekday, lesson_time = :lesson_time, period_start = :period_start,
-            period_end = :period_end, note = :note
-         WHERE id = :id'
-    );
-    $statement->execute($next + ['id' => $id]);
+            period_end = :period_end, note = :note';
+    if ($classSizeReady) {
+        $sql .= ', class_size = :class_size';
+    }
+    $sql .= ' WHERE id = :id';
+    $values = $next + ['id' => $id];
+    if (!$classSizeReady) {
+        unset($values['class_size']);
+    }
+    $statement = $pdo->prepare($sql);
+    $statement->execute($values);
 
     $changes = [];
     if ((string) $current['status'] !== $next['status']) {
@@ -557,6 +631,9 @@ function students_save(int $id, array $input): void
     }
     if ((string) $current['plan'] !== $next['plan']) {
         $changes[] = 'Forløb: ' . students_plans()[$next['plan']];
+    }
+    if ($classSizeReady && (int) ($current['class_size'] ?? 1) !== $next['class_size']) {
+        $changes[] = 'Undervisning: ' . students_class_sizes()[$next['class_size']];
     }
     if ((int) $current['lessons_total'] !== $next['lessons_total'] || (int) $current['lessons_used'] !== $next['lessons_used']) {
         $changes[] = 'Lektioner: ' . $next['lessons_used'] . ' brugt af ' . $next['lessons_total'];

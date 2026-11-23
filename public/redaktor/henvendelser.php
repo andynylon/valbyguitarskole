@@ -192,6 +192,7 @@ if ($signedIn && $databaseConfigured) {
     .logout { margin-top: 20px; }
     .gift { margin-top: 8px; }
     .gift form { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .message { margin-top: 8px; white-space: pre-wrap; }
     .ok { background: #e7f0ea; padding: 12px; }
     @media (max-width: 800px) {
       table, thead, tbody, tr, th, td { display: block; }
@@ -278,6 +279,9 @@ if ($signedIn && $databaseConfigured) {
                 <?= htmlspecialchars((string) $enquiry['student'], ENT_QUOTES) ?>
                 <?php if (trim((string) ($enquiry['instrument'] ?? '')) !== ''): ?>
                   <div><?= htmlspecialchars((string) $enquiry['instrument'], ENT_QUOTES) ?></div>
+                <?php endif; ?>
+                <?php if (trim((string) ($enquiry['message'] ?? '')) !== ''): ?>
+                  <div class="message"><?= nl2br(htmlspecialchars((string) $enquiry['message'], ENT_QUOTES)) ?></div>
                 <?php endif; ?>
                 <?php if ((string) $enquiry['offer'] !== 'Nyhedsbrev'): ?>
                   <?php if (isset($studentLinks[(int) $enquiry['id']])): ?>

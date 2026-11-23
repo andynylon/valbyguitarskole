@@ -133,6 +133,10 @@ function enquiries_save(array $enquiry): int
         $columns[] = 'rent_instrument';
         $values['rent_instrument'] = !empty($enquiry['rent_instrument']) ? 1 : 0;
     }
+    if (enquiries_ensure_column($pdo, 'message', "VARCHAR(1000) NOT NULL DEFAULT ''")) {
+        $columns[] = 'message';
+        $values['message'] = (string) ($enquiry['message'] ?? '');
+    }
     $placeholders = array_map(static fn (string $column): string => ':' . $column, $columns);
     $statement = $pdo->prepare(
         'INSERT INTO enquiries (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $placeholders) . ')'
@@ -157,6 +161,9 @@ function enquiries_list(?string $status, bool $newsletterOnly = false): array
     $rental = enquiries_ensure_column($pdo, 'rent_instrument', 'TINYINT(1) NOT NULL DEFAULT 0')
         ? 'e.rent_instrument'
         : '0 AS rent_instrument';
+    $message = enquiries_ensure_column($pdo, 'message', "VARCHAR(1000) NOT NULL DEFAULT ''")
+        ? 'e.message'
+        : "'' AS message";
     $where = [];
     $params = [];
     if ($status !== null && in_array($status, enquiries_statuses(), true)) {
@@ -168,7 +175,7 @@ function enquiries_list(?string $status, bool $newsletterOnly = false): array
     }
 
     $sql = 'SELECT e.id, e.created_at, e.offer, e.name, e.email, e.phone, e.student, e.language, '
-        . $newsletter . ', ' . $instrument . ', ' . $rental . ', e.recipient, e.greeting, e.status, g.code AS gift_code, g.status AS gift_status
+        . $newsletter . ', ' . $instrument . ', ' . $rental . ', ' . $message . ', e.recipient, e.greeting, e.status, g.code AS gift_code, g.status AS gift_status
          FROM enquiries e
          LEFT JOIN gift_cards g ON g.enquiry_id = e.id';
     if ($where !== []) {
@@ -192,8 +199,11 @@ function enquiries_get(int $id): ?array
     $instrument = enquiries_ensure_column($pdo, 'instrument', "VARCHAR(80) NOT NULL DEFAULT ''")
         ? 'instrument'
         : "'' AS instrument";
+    $message = enquiries_ensure_column($pdo, 'message', "VARCHAR(1000) NOT NULL DEFAULT ''")
+        ? 'message'
+        : "'' AS message";
     $statement = $pdo->prepare(
-        'SELECT id, offer, name, email, phone, student, ' . $instrument . ' FROM enquiries WHERE id = :id'
+        'SELECT id, offer, name, email, phone, student, ' . $instrument . ', ' . $message . ' FROM enquiries WHERE id = :id'
     );
     $statement->execute(['id' => $id]);
     $row = $statement->fetch();
