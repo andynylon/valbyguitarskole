@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Arrow } from "@/components/icons/Arrow"
+import { Check } from "@/components/icons/Check"
+import { useBooking } from "@/context/BookingContext"
 import { useText } from "@/context/ContentContext"
 import { useLanguage } from "@/context/LanguageContext"
 import "./Teachers.scss"
@@ -9,7 +11,9 @@ type Teacher = ReturnType<typeof useText>["content"]["teachers"]["people"][numbe
 export function Teachers() {
   const { content, tx } = useText()
   const { t } = useLanguage()
+  const { openBooking } = useBooking()
   const teachers = content.teachers
+  const group = content.pricing.group
   const scrollerRef = useRef<HTMLDivElement>(null)
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(false)
@@ -104,6 +108,29 @@ export function Teachers() {
         ))}
       </div>
       <p className="teachers-note">{tx(teachers.note)}</p>
+      <article className="group-class">
+        <div className="group-mark" aria-hidden="true">
+          2
+        </div>
+        <div>
+          <p className="eyebrow">{tx(group.eyebrow)}</p>
+          <h3>{tx(group.title)}</h3>
+          <p>{tx(group.text)}</p>
+        </div>
+        <div className="group-class-action">
+          <div className="group-class-notes">
+            <p className="offer-note">
+              <Check /> {tx(group.note)}
+            </p>
+            <p className="offer-note">
+              <Check /> {tx(group.noteThree)}
+            </p>
+          </div>
+          <button className="button button-light" onClick={() => openBooking(tx(group.bookingName))}>
+            {tx(group.button)} <Arrow />
+          </button>
+        </div>
+      </article>
     </section>
   )
 }

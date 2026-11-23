@@ -4,7 +4,7 @@
 .hero {
   min-height: 690px;
   display: grid;
-  grid-template-columns: 52% 48%;
+  grid-template-columns: 44% 56%;
   background: $cream;
 
   @include tablet {
@@ -76,7 +76,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 64px 7%;
+  padding: 56px 4.5%;
 
   @include tablet {
     min-height: 0;
@@ -99,10 +99,9 @@
 }
 
 .photo-frame {
-  width: min(100%, 560px);
+  width: min(100%, 760px);
   position: relative;
   z-index: 1;
-  transform: rotate(2.7deg);
   padding: 11px;
   background: $photo-mat;
   box-shadow: 0 20px 50px rgb(48 42 20 / 20%);
@@ -128,7 +127,7 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%) rotate(-2.7deg);
+  transform: translate(-50%, -50%);
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -159,7 +158,6 @@
   color: rgb(255 255 255 / 75%);
   font-size: 7px;
   letter-spacing: 0.04em;
-  transform: rotate(-2.7deg);
 }
 
 .hand-note {

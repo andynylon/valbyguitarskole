@@ -37,29 +37,6 @@ export function Pricing() {
           </article>
         ))}
       </div>
-      <article className="group-class">
-        <div className="group-mark" aria-hidden="true">
-          2
-        </div>
-        <div>
-          <p className="eyebrow">{tx(pricing.group.eyebrow)}</p>
-          <h3>{tx(pricing.group.title)}</h3>
-          <p>{tx(pricing.group.text)}</p>
-        </div>
-        <div className="group-class-action">
-          <div className="group-class-notes">
-            <p className="offer-note">
-              <Check /> {tx(pricing.group.note)}
-            </p>
-            <p className="offer-note">
-              <Check /> {tx(pricing.group.noteThree)}
-            </p>
-          </div>
-          <button className="button" onClick={() => openBooking(tx(pricing.group.bookingName))}>
-            {tx(pricing.group.button)} <Arrow />
-          </button>
-        </div>
-      </article>
       <div className="gift-card">
         <div className="gift-icon" aria-hidden="true">
           <span>♪</span>
