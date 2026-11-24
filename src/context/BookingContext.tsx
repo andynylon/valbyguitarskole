@@ -8,11 +8,16 @@ import {
   type ReactNode,
 } from "react"
 
+type BookingOptions = {
+  giftOffer?: string
+}
+
 type BookingContextValue = {
   selectedOffer: string | null
+  giftOffer: string | null
   newsletter: boolean
   submitted: boolean
-  openBooking: (offer: string) => void
+  openBooking: (offer: string, options?: BookingOptions) => void
   openNewsletter: () => void
   closeBooking: () => void
   markSubmitted: () => void
@@ -22,6 +27,7 @@ const BookingContext = createContext<BookingContextValue | null>(null)
 
 export function BookingProvider({ children }: { children: ReactNode }) {
   const [selectedOffer, setSelectedOffer] = useState<string | null>(null)
+  const [giftOffer, setGiftOffer] = useState<string | null>(null)
   const [newsletter, setNewsletter] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
@@ -32,20 +38,23 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     }
   }, [selectedOffer, newsletter])
 
-  const openBooking = useCallback((offer: string) => {
+  const openBooking = useCallback((offer: string, options?: BookingOptions) => {
     setSubmitted(false)
     setNewsletter(false)
+    setGiftOffer(options?.giftOffer ?? null)
     setSelectedOffer(offer)
   }, [])
 
   const openNewsletter = useCallback(() => {
     setSubmitted(false)
     setSelectedOffer(null)
+    setGiftOffer(null)
     setNewsletter(true)
   }, [])
 
   const closeBooking = useCallback(() => {
     setSelectedOffer(null)
+    setGiftOffer(null)
     setNewsletter(false)
     setSubmitted(false)
   }, [])
@@ -57,6 +66,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       selectedOffer,
+      giftOffer,
       newsletter,
       submitted,
       openBooking,
@@ -64,7 +74,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       closeBooking,
       markSubmitted,
     }),
-    [selectedOffer, newsletter, submitted, openBooking, openNewsletter, closeBooking, markSubmitted],
+    [selectedOffer, giftOffer, newsletter, submitted, openBooking, openNewsletter, closeBooking, markSubmitted],
   )
 
   return (

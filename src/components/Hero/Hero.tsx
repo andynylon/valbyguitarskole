@@ -76,12 +76,6 @@ export function Hero() {
           </div>
           <span className="photo-credit">{tx(hero.photoCredit)}</span>
         </div>
-        <div className="hand-note">
-          <span>♪</span>
-          {tx(hero.noteLine1)}
-          <br />
-          {tx(hero.noteLine2)}
-        </div>
       </div>
     </section>
   )

@@ -100,8 +100,6 @@ function editor_label(string $key): string
         'imageAlt' => 'Billedtekst',
         'play' => 'Afspil-knap',
         'photoCredit' => 'Kreditering',
-        'noteLine1' => 'Note, første linje',
-        'noteLine2' => 'Note, anden linje',
         'label' => 'Etiket',
         'items' => 'Punkter',
         'noteBefore' => 'Note før det fremhævede ord',

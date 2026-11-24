@@ -73,14 +73,6 @@
     "photoCredit": {
       "da": "Foreløbig video",
       "en": "Placeholder video"
-    },
-    "noteLine1": {
-      "da": "Her starter",
-      "en": "Music starts"
-    },
-    "noteLine2": {
-      "da": "musikken",
-      "en": "here"
     }
   },
   "marquee": {
@@ -688,6 +680,238 @@
       "da": "Prøvetimen koster 150 kr. denne uge, halvdelen af normalprisen. Udfyld dine oplysninger, så finder vi en tid. Der er ingen binding.",
       "en": "The trial lesson is DKK 150 this week, half the usual price. Leave your details and we will find a time. There is no commitment."
     }
+  },
+  "christmas": {
+    "until": "2026-12-24",
+    "metaTitle": {
+      "da": "Gavekort til jul — Valby Guitarskole",
+      "en": "A Christmas gift card — Valby Guitar School"
+    },
+    "metaDescription": {
+      "da": "Giv guitarundervisning i julegave. Vælg 1, 5, 10 eller 20 lektioner hos Valby Guitarskole. Gavekortet sendes, når betalingen er gået ind.",
+      "en": "Give guitar lessons as a Christmas gift. Choose 1, 5, 10 or 20 lessons at Valby Guitar School. The gift card is sent once payment has arrived."
+    },
+    "navCampaign": {
+      "da": "Jul",
+      "en": "Christmas"
+    },
+    "navGift": {
+      "da": "Gavekort",
+      "en": "Gift card"
+    },
+    "navLessons": {
+      "da": "Undervisning",
+      "en": "Lessons"
+    },
+    "navSchool": {
+      "da": "Se skolen",
+      "en": "See the school"
+    },
+    "homeLink": {
+      "da": "Se julekampagnen",
+      "en": "See the Christmas campaign"
+    },
+    "eyebrow": {
+      "da": "Julegave · til og med 24. december",
+      "en": "A Christmas gift · through 24 December"
+    },
+    "endedEyebrow": {
+      "da": "Gavekort til undervisning",
+      "en": "A gift card for lessons"
+    },
+    "titleLine1": {
+      "da": "Giv musikken",
+      "en": "Give the music"
+    },
+    "titleLine2": {
+      "da": "videre.",
+      "en": "on."
+    },
+    "intro": {
+      "da": "Et gavekort til guitar, elguitar, bas eller ukulele hos Valby Guitarskole. Vælg 1, 5, 10 eller 20 lektioner. Vi sender kortet, når betalingen er gået ind — klar til at give videre.",
+      "en": "A gift card for guitar, electric guitar, bass or ukulele at Valby Guitar School. Choose 1, 5, 10 or 20 lessons. We send the card once payment has arrived — ready to pass on."
+    },
+    "deadline": {
+      "da": "Bestil senest juleaften, hvis gaven skal nå frem inden jul.",
+      "en": "Order by Christmas Eve if the gift needs to arrive before Christmas."
+    },
+    "endedNote": {
+      "da": "Julekampagnen er slut. Gavekort kan stadig bestilles året rundt.",
+      "en": "The Christmas campaign has ended. Gift cards can still be ordered all year."
+    },
+    "day": {
+      "da": "dag til juleaften",
+      "en": "day until Christmas Eve"
+    },
+    "days": {
+      "da": "dage til juleaften",
+      "en": "days until Christmas Eve"
+    },
+    "lastDay": {
+      "da": "I dag er sidste dag",
+      "en": "Today is the last day"
+    },
+    "button": {
+      "da": "Vælg gavekort",
+      "en": "Choose a gift card"
+    },
+    "lessonsLink": {
+      "da": "Tilmeld dig undervisning",
+      "en": "Sign up for lessons"
+    },
+    "video": "/video/welcome.mp4",
+    "imageAlt": {
+      "da": "Velkomstvideo fra Valby Guitarskole",
+      "en": "Welcome video from Valby Guitar School"
+    },
+    "play": {
+      "da": "Afspil med lyd",
+      "en": "Play with sound"
+    },
+    "photoCredit": {
+      "da": "Foreløbig video",
+      "en": "Placeholder video"
+    },
+    "cardKicker": {
+      "da": "Valby Guitarskole",
+      "en": "Valby Guitar School"
+    },
+    "cardTitle": {
+      "da": "Gavekort",
+      "en": "Gift card"
+    },
+    "cardLine": {
+      "da": "Gaven til den, der har alt",
+      "en": "The gift for the person who has everything"
+    },
+    "packagesEyebrow": {
+      "da": "Vælg et forløb",
+      "en": "Choose a course"
+    },
+    "packagesTitle1": {
+      "da": "Fire gaver.",
+      "en": "Four gifts."
+    },
+    "packagesTitle2": {
+      "da": "Samme skole.",
+      "en": "Same school."
+    },
+    "packagesIntro": {
+      "da": "Priserne er de samme som til almindelig undervisning. Du betaler med MobilePay eller bankoverførsel, og vi sender gavekortet, når betalingen er gået ind.",
+      "en": "The prices are the same as for regular lessons. Pay by MobilePay or bank transfer, and we send the gift card once the payment has arrived."
+    },
+    "give": {
+      "da": "Giv dette",
+      "en": "Give this"
+    },
+    "featured": {
+      "da": "Mest givet",
+      "en": "Most given"
+    },
+    "packageCopy": [
+      {
+        "offer": "Prøvetime",
+        "text": {
+          "da": "Én lektion til den, der vil prøve skolen, før der bliver talt om mere.",
+          "en": "One lesson for someone who wants to try the school before deciding on more."
+        }
+      },
+      {
+        "offer": "5 lektioner",
+        "text": {
+          "da": "Fem lektioner. Nok til at komme i gang og mærke, om det fænger.",
+          "en": "Five lessons. Enough to get started and see whether it takes hold."
+        }
+      },
+      {
+        "offer": "10 lektioner",
+        "text": {
+          "da": "Ti lektioner. Den gave, der giver tid til at lære noget, der bliver hængende.",
+          "en": "Ten lessons. The gift that leaves time to learn something that stays."
+        }
+      },
+      {
+        "offer": "Halvt år",
+        "text": {
+          "da": "Et halvt år med fast tid. Til den, der virkelig skal i gang.",
+          "en": "Six months with a regular time. For someone who is ready to begin in earnest."
+        }
+      }
+    ],
+    "stepsEyebrow": {
+      "da": "Sådan gør du",
+      "en": "How it works"
+    },
+    "stepsTitle1": {
+      "da": "Tre trin.",
+      "en": "Three steps."
+    },
+    "stepsTitle2": {
+      "da": "Så er gaven klar.",
+      "en": "Then the gift is ready."
+    },
+    "steps": [
+      {
+        "title": {
+          "da": "Vælg forløb",
+          "en": "Choose a course"
+        },
+        "text": {
+          "da": "Vælg 1, 5, 10 eller 20 lektioner, og skriv hvem kortet er til.",
+          "en": "Choose 1, 5, 10 or 20 lessons, and write who the card is for."
+        }
+      },
+      {
+        "title": {
+          "da": "Betal",
+          "en": "Pay"
+        },
+        "text": {
+          "da": "Du får en mail med MobilePay eller bankoverførsel. Kortet sendes, når betalingen er gået ind.",
+          "en": "You get an email with MobilePay or bank transfer. The card is sent once the payment has arrived."
+        }
+      },
+      {
+        "title": {
+          "da": "Giv det videre",
+          "en": "Pass it on"
+        },
+        "text": {
+          "da": "Gavekortet lander i din indbakke, klar til at printe eller sende videre.",
+          "en": "The gift card lands in your inbox, ready to print or forward."
+        }
+      }
+    ],
+    "lessonsEyebrow": {
+      "da": "Eller start selv",
+      "en": "Or start yourself"
+    },
+    "lessonsTitle1": {
+      "da": "Almindelig",
+      "en": "Regular"
+    },
+    "lessonsTitle2": {
+      "da": "undervisning.",
+      "en": "lessons."
+    },
+    "lessonsIntro": {
+      "da": "Kampagnen er til gaven. Herunder kan du tilmelde dig selv eller dit barn til den almindelige undervisning — prøvetime, kortere forløb eller et halvt år.",
+      "en": "The campaign is for the gift. Below, you can sign yourself or your child up for regular lessons — a trial, a shorter course, or six months."
+    },
+    "marqueeLabel": {
+      "da": "Gavekort til jul",
+      "en": "A Christmas gift card"
+    },
+    "marquee": [
+      { "da": "Gavekort", "en": "Gift card" },
+      { "da": "Guitar", "en": "Guitar" },
+      { "da": "Elguitar", "en": "Electric guitar" },
+      { "da": "Bas", "en": "Bass" },
+      { "da": "Ukulele", "en": "Ukulele" },
+      { "da": "Børn og voksne", "en": "Children and adults" },
+      { "da": "Valby", "en": "Valby" },
+      { "da": "Til juleaften", "en": "Until Christmas Eve" }
+    ]
   },
   "cookies": {
     "text": {

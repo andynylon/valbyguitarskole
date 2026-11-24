@@ -6,6 +6,7 @@ import { About } from "@/components/About/About"
 import { Audience } from "@/components/Audience/Audience"
 import { BookingModal } from "@/components/BookingModal/BookingModal"
 import { Campaign } from "@/components/Campaign/Campaign"
+import { ChristmasPage } from "@/components/Christmas/Christmas"
 import { Contact } from "@/components/Contact/Contact"
 import { Footer } from "@/components/Footer/Footer"
 import { Header } from "@/components/Header/Header"
@@ -14,30 +15,38 @@ import { Marquee } from "@/components/Marquee/Marquee"
 import { Pricing } from "@/components/Pricing/Pricing"
 import { Prompts } from "@/components/Prompts/Prompts"
 import { Teachers } from "@/components/Teachers/Teachers"
+import { isCampaignPath } from "@/lib/campaign"
 
-export default function App() {
+function HomePage() {
+  return (
+    <main id="top">
+      <Header />
+      <Hero />
+      <Marquee />
+      <Audience />
+      <Pricing />
+      <Teachers />
+      <About />
+      <Contact />
+      <Footer />
+      <BookingModal />
+      <Campaign />
+      <Prompts />
+    </main>
+  )
+}
+
+export default function App({ path }: { path?: string }) {
+  const route = path ?? (typeof window !== "undefined" ? window.location.pathname : "/")
+  const campaign = isCampaignPath(route)
+
   return (
     <LanguageProvider>
       <ContentProvider>
-      <DocumentMeta />
-      <BookingProvider>
-        <NoticeProvider>
-          <main id="top">
-            <Header />
-            <Hero />
-            <Marquee />
-            <Audience />
-            <Pricing />
-            <Teachers />
-            <About />
-            <Contact />
-            <Footer />
-            <BookingModal />
-            <Campaign />
-            <Prompts />
-          </main>
-        </NoticeProvider>
-      </BookingProvider>
+        <DocumentMeta campaign={campaign} />
+        <BookingProvider>
+          <NoticeProvider>{campaign ? <ChristmasPage /> : <HomePage />}</NoticeProvider>
+        </BookingProvider>
       </ContentProvider>
     </LanguageProvider>
   )

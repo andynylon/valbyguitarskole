@@ -25,7 +25,7 @@ function useAfter(delay: number, active: boolean, blocked: boolean) {
   return ready
 }
 
-export function Prompts() {
+export function Prompts({ hideGift = false }: { hideGift?: boolean }) {
   const { content, tx } = useText()
   const { selectedOffer, newsletter, openBooking } = useBooking()
   const { campaignOpen, campaignSettled } = useNotices()
@@ -42,7 +42,7 @@ export function Prompts() {
 
   const blocked = Boolean(selectedOffer || newsletter || campaignOpen)
   const giftReady = useAfter(10_000, preferencesRead && !giftState && campaignSettled, blocked)
-  const showGift = giftReady && !blocked && !giftState
+  const showGift = !hideGift && giftReady && !blocked && !giftState
 
   useEffect(() => {
     if (!showGift) return

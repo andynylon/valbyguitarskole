@@ -159,21 +159,3 @@
   font-size: 7px;
   letter-spacing: 0.04em;
 }
-
-.hand-note {
-  position: absolute;
-  z-index: 2;
-  bottom: 9%;
-  left: 6%;
-  transform: rotate(-8deg);
-  color: $forest;
-  font: 500 italic 20px/1.05 $font-serif;
-
-  span {
-    font-family: $font-sans;
-    font-style: normal;
-    font-size: 40px;
-    display: inline-block;
-    margin-right: 8px;
-  }
-}

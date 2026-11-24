@@ -7,25 +7,37 @@ const serverEntry = path.join(root, "dist/server/entry-server.js")
 const content = JSON.parse(fs.readFileSync(path.join(root, "src/data/content.json"), "utf8"))
 
 const { render } = await import(serverEntry)
-const appHtml = render()
-
-if (!appHtml.includes('id="top"')) {
-  throw new Error("Prerender did not include the page")
-}
-
-let template = fs.readFileSync(templatePath, "utf8")
+const shell = fs.readFileSync(templatePath, "utf8")
 const marker = '<div id="root"></div>'
-if (!template.includes(marker)) {
+if (!shell.includes(marker)) {
   throw new Error("Could not find the root element in dist/index.html")
 }
 
-template = template.replace(marker, `<div id="root">${appHtml}</div>`)
-template = replaceTag(template, "title", content.meta.title.da)
-template = replaceMeta(template, "name", "description", content.meta.description.da)
-template = replaceMeta(template, "property", "og:title", content.meta.title.da)
-template = replaceMeta(template, "property", "og:description", content.meta.description.da)
-template = replaceJsonLd(template, content)
-fs.writeFileSync(templatePath, template)
+const homeHtml = render("/")
+if (!homeHtml.includes('id="top"')) {
+  throw new Error("Prerender did not include the page")
+}
+fs.writeFileSync(templatePath, apply(shell, homeHtml, content.meta.title.da, content.meta.description.da))
+
+const christmasHtml = render("/jul")
+if (!christmasHtml.includes("Giv musikken")) {
+  throw new Error("Prerender did not include the Christmas page")
+}
+const christmasDir = path.join(root, "dist/jul")
+fs.mkdirSync(christmasDir, { recursive: true })
+fs.writeFileSync(
+  path.join(christmasDir, "index.html"),
+  apply(shell, christmasHtml, content.christmas.metaTitle.da, content.christmas.metaDescription.da),
+)
+
+function apply(template, appHtml, title, description) {
+  let html = template.replace(marker, `<div id="root">${appHtml}</div>`)
+  html = replaceTag(html, "title", title)
+  html = replaceMeta(html, "name", "description", description)
+  html = replaceMeta(html, "property", "og:title", title)
+  html = replaceMeta(html, "property", "og:description", description)
+  return replaceJsonLd(html, content)
+}
 
 function escapeText(value) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;")
