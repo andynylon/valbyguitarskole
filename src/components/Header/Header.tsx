@@ -2,24 +2,33 @@ import { useState } from "react"
 import { useBooking } from "@/context/BookingContext"
 import { useText } from "@/context/ContentContext"
 import { useLanguage } from "@/context/LanguageContext"
+import { useChristmasLive } from "@/lib/campaign"
 import { Arrow } from "@/components/icons/Arrow"
 import { Logo } from "@/components/Logo/Logo"
 import "./Header.scss"
 
-export function Header() {
+export function Header({ campaign = false }: { campaign?: boolean }) {
   const { language, setLanguage, t } = useLanguage()
   const { content, tx } = useText()
   const { openBooking } = useBooking()
+  const { live } = useChristmasLive(content.christmas.until)
   const [menuOpen, setMenuOpen] = useState(false)
   const english = language === "en"
 
-  const links = [
-    { href: "#undervisning", label: tx(content.nav.lessons) },
-    { href: "#priser", label: tx(content.nav.pricing) },
-    { href: "#undervisere", label: tx(content.nav.teachers) },
-    { href: "#om", label: tx(content.nav.about) },
-    { href: "#kontakt", label: tx(content.nav.contact) },
-  ]
+  const links = campaign
+    ? [
+        { href: "#gavekort", label: tx(content.christmas.navGift) },
+        { href: "#priser", label: tx(content.christmas.navLessons) },
+        { href: "/", label: tx(content.christmas.navSchool) },
+      ]
+    : [
+        ...(live ? [{ href: "/jul", label: tx(content.christmas.navCampaign) }] : []),
+        { href: "#undervisning", label: tx(content.nav.lessons) },
+        { href: "#priser", label: tx(content.nav.pricing) },
+        { href: "#undervisere", label: tx(content.nav.teachers) },
+        { href: "#om", label: tx(content.nav.about) },
+        { href: "#kontakt", label: tx(content.nav.contact) },
+      ]
 
   const closeMenu = () => setMenuOpen(false)
 
@@ -55,11 +64,15 @@ export function Header() {
         <button
           className="button button-small nav-cta"
           onClick={() => {
-            openBooking(tx(content.contact.bookingName))
+            if (campaign) {
+              document.querySelector("#gavekort")?.scrollIntoView({ behavior: "smooth" })
+            } else {
+              openBooking(tx(content.contact.bookingName))
+            }
             closeMenu()
           }}
         >
-          {tx(content.nav.book)} <Arrow />
+          {campaign ? tx(content.christmas.button) : tx(content.nav.book)} <Arrow />
         </button>
       </nav>
       <button

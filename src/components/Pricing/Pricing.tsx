@@ -1,26 +1,45 @@
 import { useText } from "@/context/ContentContext"
 import { useBooking } from "@/context/BookingContext"
+import { useChristmasLive } from "@/lib/campaign"
 import { Arrow } from "@/components/icons/Arrow"
 import { Check } from "@/components/icons/Check"
 import "./Pricing.scss"
 
-export function Pricing() {
+type PricingHeading = {
+  eyebrow: string
+  titleLine1: string
+  titleLine2: string
+  intro: string
+}
+
+export function Pricing({
+  hideGift = false,
+  heading,
+}: {
+  hideGift?: boolean
+  heading?: PricingHeading
+}) {
   const { content, tx } = useText()
   const { openBooking } = useBooking()
+  const { live } = useChristmasLive(content.christmas.until)
   const pricing = content.pricing
+  const eyebrow = heading?.eyebrow ?? tx(pricing.eyebrow)
+  const titleLine1 = heading?.titleLine1 ?? tx(pricing.titleLine1)
+  const titleLine2 = heading?.titleLine2 ?? tx(pricing.titleLine2)
+  const intro = heading?.intro ?? tx(pricing.intro)
 
   return (
     <section className="pricing section" id="priser">
       <div className="pricing-top">
         <div className="section-heading">
-          <p className="eyebrow">{tx(pricing.eyebrow)}</p>
+          <p className="eyebrow">{eyebrow}</p>
           <h2>
-            {tx(pricing.titleLine1)}
+            {titleLine1}
             <br />
-            <em>{tx(pricing.titleLine2)}</em>
+            <em>{titleLine2}</em>
           </h2>
         </div>
-        <p>{tx(pricing.intro)}</p>
+        <p>{intro}</p>
       </div>
       <div className="offer-grid">
         {pricing.offers.map((offer) => (
@@ -37,22 +56,29 @@ export function Pricing() {
           </article>
         ))}
       </div>
-      <div className="gift-card">
-        <div className="gift-icon" aria-hidden="true">
-          <span>♪</span>
+      {!hideGift && (
+        <div className="gift-card">
+          <div className="gift-icon" aria-hidden="true">
+            <span>♪</span>
+          </div>
+          <div>
+            <p className="eyebrow">{tx(content.gift.eyebrow)}</p>
+            <h3>{tx(content.gift.title)}</h3>
+            <p>{tx(content.gift.text)}</p>
+            {live && (
+              <a className="gift-campaign-link" href="/jul">
+                {tx(content.christmas.homeLink)} <Arrow />
+              </a>
+            )}
+          </div>
+          <button
+            className="button button-light"
+            onClick={() => openBooking(tx(content.gift.bookingName))}
+          >
+            {tx(content.gift.button)} <Arrow />
+          </button>
         </div>
-        <div>
-          <p className="eyebrow">{tx(content.gift.eyebrow)}</p>
-          <h3>{tx(content.gift.title)}</h3>
-          <p>{tx(content.gift.text)}</p>
-        </div>
-        <button
-          className="button button-light"
-          onClick={() => openBooking(tx(content.gift.bookingName))}
-        >
-          {tx(content.gift.button)} <Arrow />
-        </button>
-      </div>
+      )}
     </section>
   )
 }

@@ -1,0 +1,434 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.xmas-hero {
+  min-height: 690px;
+  display: grid;
+  grid-template-columns: 48% 52%;
+  background: $cream;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+}
+
+.xmas-hero-copy {
+  padding: clamp(68px, 8vw, 108px) 6vw 72px;
+  align-self: center;
+
+  h1 {
+    max-width: 640px;
+  }
+
+  @include tablet {
+    padding: 64px 24px 48px;
+  }
+}
+
+.xmas-intro {
+  max-width: 540px;
+  margin: 28px 0 0;
+  font-size: 17px;
+  line-height: 1.65;
+  color: $muted;
+}
+
+.xmas-deadline {
+  max-width: 480px;
+  margin: 18px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: $forest;
+  font-weight: 600;
+}
+
+.xmas-count {
+  display: inline-block;
+  margin: 16px 0 0;
+  padding: 8px 12px;
+  background: $forest;
+  color: $yellow;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.xmas-actions {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-top: 32px;
+
+  @include mobile {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 22px;
+
+    .button {
+      width: 100%;
+    }
+
+    .text-link {
+      justify-content: center;
+    }
+  }
+}
+
+.xmas-hero-visual {
+  position: relative;
+  min-height: 690px;
+  background: $forest;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 56px 5% 72px;
+
+  @include tablet {
+    min-height: 0;
+    padding: 56px 8% 72px;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    padding: 48px 24px 56px;
+  }
+}
+
+.xmas-frame {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 640px);
+  padding: 11px;
+  background: $photo-mat;
+  box-shadow: 0 20px 50px rgb(0 0 0 / 28%);
+
+  video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: $forest;
+    filter: saturate(0.78) contrast(0.94);
+  }
+}
+
+.xmas-video {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.xmas-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(251 248 239 / 92%);
+  color: $forest;
+  padding: 12px 16px 12px 14px;
+  font: 600 13px $font-sans;
+  box-shadow: 0 10px 30px rgb(23 63 55 / 28%);
+
+  span {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: $forest;
+    color: $cream;
+    font-size: 11px;
+  }
+}
+
+.xmas-credit {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  color: rgb(255 255 255 / 75%);
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
+.xmas-sun {
+  position: absolute;
+  width: 72%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: $coral-sun;
+  top: 12%;
+  right: -16%;
+}
+
+.xmas-voucher {
+  width: 236px;
+  position: absolute;
+  z-index: 2;
+  left: 6%;
+  bottom: 8%;
+  padding: 18px 18px 16px;
+  background: $ivory;
+  color: $ink;
+  box-shadow: 0 18px 40px rgb(0 0 0 / 28%);
+  transform: rotate(-4deg);
+
+  > p:first-child {
+    margin: 0;
+    color: $coral-deep;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    margin: 8px 0 0;
+    font: italic 40px/0.9 $font-serif;
+    letter-spacing: -0.04em;
+    color: $forest;
+  }
+
+  @include reduced-motion {
+    transform: none;
+  }
+
+  @include tablet {
+    left: 8%;
+    bottom: 28px;
+  }
+
+  @include mobile {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    width: min(100%, 260px);
+    margin: 22px auto 0;
+  }
+}
+
+.xmas-voucher-line {
+  margin: 12px 0 0;
+  font: italic 17px/1.3 $font-serif;
+  letter-spacing: -0.02em;
+  color: $ink;
+}
+
+.xmas-voucher-amount {
+  margin: 14px 0 0;
+  font: 400 26px/1 $font-serif;
+}
+
+.xmas-voucher-for {
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.xmas-packages {
+  background: $paper;
+}
+
+.xmas-packages-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 48px;
+  margin-bottom: 56px;
+
+  > p {
+    width: min(100%, 380px);
+    margin: 0 0 6px;
+    font-size: 14px;
+    line-height: 1.75;
+    color: $muted-soft;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 22px;
+
+    > p {
+      width: auto;
+    }
+  }
+}
+
+.xmas-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 1300px;
+  margin: 0 auto;
+
+  @include tablet {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.xmas-package {
+  min-height: 390px;
+  padding: 32px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-right: 1px solid rgb(24 54 47 / 18%);
+
+  &:first-child {
+    border-left: 1px solid rgb(24 54 47 / 18%);
+  }
+
+  &.cream {
+    background: $card-cream;
+  }
+
+  &.yellow {
+    background: $yellow-card;
+  }
+
+  &.coral {
+    background: $coral-card;
+    color: $ivory;
+    transform: translateY(-14px);
+    min-height: 418px;
+
+    @include tablet {
+      transform: none;
+      min-height: 390px;
+    }
+  }
+
+  &.green {
+    background: $green;
+    color: $ivory;
+  }
+
+  h3 {
+    margin: 22px 0 14px;
+    font: 400 31px $font-serif;
+  }
+
+  button {
+    margin-top: 0;
+    border: 0;
+    border-top: 1px solid currentColor;
+    background: transparent;
+    color: inherit;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0 0;
+    font: 600 12px $font-sans;
+
+    svg {
+      width: 18px;
+    }
+  }
+
+  @include mobile {
+    min-height: 0;
+    border-left: 1px solid rgb(24 54 47 / 18%);
+    border-bottom: 1px solid rgb(24 54 47 / 18%);
+
+    &.coral {
+      min-height: 0;
+    }
+  }
+}
+
+.xmas-badge {
+  display: inline-block;
+  width: fit-content;
+  margin: 0 0 16px;
+  padding: 6px 8px;
+  background: $yellow;
+  color: $ink;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.xmas-package-name {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+}
+
+.xmas-package-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  opacity: 0.78;
+}
+
+.xmas-package-note {
+  margin: auto 0 18px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.xmas-steps {
+  background: $forest;
+  color: $cream;
+
+  .eyebrow {
+    color: $yellow;
+  }
+
+  h2 em {
+    color: $coral-sun;
+  }
+
+  ol {
+    list-style: none;
+    margin: 56px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 36px;
+  }
+
+  li span {
+    display: block;
+    margin-bottom: 18px;
+    color: $yellow;
+    font: italic 42px/1 $font-serif;
+  }
+
+  h3 {
+    margin: 0 0 10px;
+    font: 600 18px $font-sans;
+  }
+
+  li p {
+    margin: 0;
+    max-width: 320px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgb(245 238 221 / 78%);
+  }
+
+  @include mobile {
+    ol {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+}

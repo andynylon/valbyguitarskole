@@ -47,17 +47,18 @@ export function useText() {
   return { content, tx, language }
 }
 
-export function DocumentMeta() {
+export function DocumentMeta({ campaign = false }: { campaign?: boolean }) {
   const { language } = useLanguage()
   const content = useContent()
 
   useEffect(() => {
-    document.title = content.meta.title[language]
-    document.querySelector('meta[name="description"]')?.setAttribute(
-      "content",
-      content.meta.description[language],
-    )
-  }, [content, language])
+    const title = campaign ? content.christmas.metaTitle[language] : content.meta.title[language]
+    const description = campaign
+      ? content.christmas.metaDescription[language]
+      : content.meta.description[language]
+    document.title = title
+    document.querySelector('meta[name="description"]')?.setAttribute("content", description)
+  }, [campaign, content, language])
 
   return null
 }

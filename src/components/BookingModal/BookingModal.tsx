@@ -2,31 +2,15 @@ import { useEffect, useState, type FormEvent } from "react"
 import { useBooking } from "@/context/BookingContext"
 import { useText } from "@/context/ContentContext"
 import { useLanguage } from "@/context/LanguageContext"
-import type { SiteContent } from "@/data/content"
-import type { Language } from "@/data/offers"
+import { giftPackageLabel, giftPackageOptions } from "@/data/giftCourses"
 import { Arrow } from "@/components/icons/Arrow"
 import { Check } from "@/components/icons/Check"
 import "./BookingModal.scss"
 
-const giftCourses = [
-  { offer: "Prøvetime", da: "1 lektion", en: "1 lesson", price: { da: "300 kr.", en: "DKK 300" } },
-  { offer: "5 lektioner", da: "5 lektioner", en: "5 lessons", price: { da: "1.500 kr.", en: "DKK 1,500" } },
-  { offer: "10 lektioner", da: "10 lektioner", en: "10 lessons", price: { da: "2.850 kr.", en: "DKK 2,850" } },
-  { offer: "Halvt år", da: "20 lektioner", en: "20 lessons", price: { da: "5.750 kr.", en: "DKK 5,750" } },
-]
-
-function giftPackages(content: SiteContent, language: Language) {
-  return giftCourses.map((course) => {
-    const match = content.pricing.offers.find((offer) => offer.name.da === course.offer)
-    const price = match?.price[language] ?? course.price[language]
-    return `${course[language]} · ${price}`
-  })
-}
-
 export function BookingModal() {
   const { t, language } = useLanguage()
   const { content, tx } = useText()
-  const { selectedOffer, newsletter, submitted, closeBooking, markSubmitted } = useBooking()
+  const { selectedOffer, giftOffer, newsletter, submitted, closeBooking, markSubmitted } = useBooking()
   const [sending, setSending] = useState(false)
   const [error, setError] = useState(false)
   const [studentChoice, setStudentChoice] = useState("")
@@ -42,6 +26,11 @@ export function BookingModal() {
     setClassSize(groupOffer ? "2" : "1")
     setError(false)
   }, [selectedOffer, newsletter, groupOffer])
+
+  useEffect(() => {
+    if (!giftOffer) return
+    setStudentChoice(giftPackageLabel(content, language, giftOffer))
+  }, [giftOffer, language, content])
 
   if (!selectedOffer && !newsletter) return null
 
@@ -226,7 +215,7 @@ export function BookingModal() {
                         {t("Vælg her", "Choose here")}
                       </option>
                       {giftCard ? (
-                        giftPackages(content, language).map((option) => (
+                        giftPackageOptions(content, language).map((option) => (
                           <option key={option} value={option}>
                             {option}
                           </option>
