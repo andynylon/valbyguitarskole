@@ -124,7 +124,7 @@ function staging_login(string $error = ''): void
     echo '<!doctype html><html lang="da"><head><meta charset="utf-8">'
         . '<meta name="viewport" content="width=device-width, initial-scale=1">'
         . '<meta name="robots" content="noindex, nofollow, noarchive">'
-        . '<title>Staging — Valby Guitarskole</title>'
+        . '<title>Staging - Valby Guitarskole</title>'
         . '<style>'
         . 'body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f5eedd;color:#18362f;font:16px/1.5 system-ui,sans-serif}'
         . 'main{width:min(420px,calc(100% - 32px));background:#fff;padding:28px}'

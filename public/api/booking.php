@@ -50,6 +50,7 @@ $classSize = booking_class_size($payload, $signup, $gift);
 $offer = booking_with_class($offer, $classSize, $language);
 $newsletter = $signup || (($payload['newsletter'] ?? false) === true);
 $rental = !$signup && (($payload['rental'] ?? false) === true);
+$moms = !$signup && (($payload['moms'] ?? false) === true);
 
 if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || (!$signup && ($offer === '' || $phone === '' || $student === '' || $instrument === '')) || ($gift && $recipient === '')) {
     http_response_code(400);
@@ -67,6 +68,7 @@ $enquiry = [
     'rent_instrument' => $rental,
     'language' => $language,
     'newsletter' => $newsletter,
+    'moms' => $moms,
     'recipient' => $gift ? $recipient : '',
     'greeting' => $gift ? $greeting : '',
     'message' => $message,
@@ -88,7 +90,7 @@ $configFile = dirname(__DIR__, 2) . '/private/mail-config.php';
 $config = is_file($configFile) ? require $configFile : null;
 if (is_array($config) && isset($config['username'], $config['password'], $config['from'], $config['to'])) {
     $subject = $signup ? 'Ny tilmelding til nyhedsbrev' : (($gift ? 'Nyt gavekort: ' : 'Ny forespørgsel: ') . $offer);
-    $body = enquiryMail($gift, $offer, $name, $email, $phone, $student, $instrument, $rental, $recipient, $greeting, $enquiryId, $newsletter, $classSize, $message);
+    $body = enquiryMail($gift, $offer, $name, $email, $phone, $student, $instrument, $rental, $recipient, $greeting, $enquiryId, $newsletter, $classSize, $message, $moms);
 
     try {
         $from = (string) $config['from'];
@@ -97,15 +99,16 @@ if (is_array($config) && isset($config['username'], $config['password'], $config
         try {
             smtpDeliver($socket, $from, $school, $email, $subject, $body, false, 'text/html');
             $mailed = true;
+            $replyInline = [];
             try {
                 if ($signup) {
                     [$replySubject, $replyBody] = newsletterReply($name, $language);
                 } elseif ($gift) {
-                    [$replySubject, $replyBody] = gift_order_reply($name, $student, $recipient, $language, $enquiryId, $newsletter);
+                    [$replySubject, $replyBody, $replyInline] = gift_order_reply($name, $student, $recipient, $language, $enquiryId, $newsletter, $moms);
                 } else {
-                    [$replySubject, $replyBody] = autoReply($name, $offer, $language, $newsletter);
+                    [$replySubject, $replyBody, $replyInline] = autoReply($name, $offer, $language, $newsletter, $moms);
                 }
-                smtpDeliver($socket, $from, $email, $from, $replySubject, $replyBody, true, 'text/html');
+                smtpDeliver($socket, $from, $email, $from, $replySubject, $replyBody, true, 'text/html', $replyInline);
             } catch (Throwable $error) {
                 error_log('Booking auto-reply failed: ' . $error->getMessage());
             }
@@ -146,7 +149,8 @@ function enquiryMail(
     int $enquiryId,
     bool $newsletter,
     int $classSize,
-    string $message
+    string $message,
+    bool $moms = false
 ): string {
     $sans = mail_sans();
     $labelStyle = 'padding:9px 16px 9px 0;border-bottom:1px solid #eadfcd;font-family:' . $sans . ';font-size:12px;line-height:1.4;letter-spacing:0.04em;text-transform:uppercase;color:#da5944;vertical-align:top;';
@@ -172,6 +176,17 @@ function enquiryMail(
         $rows[] = ['Leje', 'Ja'];
     }
     $rows[] = ['Nyhedsbrev', $newsletter ? 'Ja' : 'Nej'];
+    if ($offer !== 'Nyhedsbrev') {
+        $product = $gift ? $detail : $offer;
+        $momsLabel = $moms ? 'Ja' : 'Nej';
+        $arrow = $moms ? mobilepay_price_arrow($product, false) : '';
+        if ($arrow !== '') {
+            $momsLabel .= ' · ' . $arrow;
+        }
+        $payUrl = mobilepay_url($product, $moms);
+        $rows[] = ['30 år eller derover', mail_esc($momsLabel)];
+        $rows[] = ['MobilePay', '<a href="' . mail_esc($payUrl) . '" style="color:#173f37;text-decoration:underline;">' . mail_esc($payUrl) . '</a>'];
+    }
     if ($gift) {
         $rows[] = ['Til', mail_esc($recipient)];
         if ($greeting !== '') {
@@ -198,29 +213,35 @@ function enquiryMail(
     return mail_shell('da', mail_card(mail_brand() . $heading . $table));
 }
 
-function autoReply(string $name, string $offer, string $language, bool $newsletter): array
+function autoReply(string $name, string $offer, string $language, bool $newsletter, bool $moms = false): array
 {
     $safeName = mail_esc($name);
     $safeOffer = mail_esc($offer);
-    if ($language === 'en') {
+    $english = $language === 'en';
+    [$paymentHtml, $inline] = mobilepay_payment_parts($offer, $moms, $english);
+    if ($english) {
         $body = mail_brand()
             . mail_p('Hi ' . $safeName . ',')
             . mail_p('Thank you for your message. We have received your enquiry about ' . $safeOffer . ' and will get back to you as soon as we can, within one working day.')
+            . mobilepay_moms_html($offer, $moms, true)
+            . $paymentHtml
             . ($newsletter ? mail_p('You are also signed up for the newsletter.') : '')
             . mail_p('We look forward to playing with you.')
             . mail_signoff(true);
 
-        return ['We have received your enquiry', mail_shell('en', mail_card($body))];
+        return ['We have received your enquiry', mail_shell('en', mail_card($body)), $inline];
     }
 
     $body = mail_brand()
         . mail_p('Hej ' . $safeName . ',')
         . mail_p('Tak for din besked. Vi har modtaget din forespørgsel om ' . $safeOffer . ' og vender tilbage hurtigst muligt, senest inden for én hverdag.')
+        . mobilepay_moms_html($offer, $moms, false)
+        . $paymentHtml
         . ($newsletter ? mail_p('Du er også tilmeldt nyhedsbrevet.') : '')
         . mail_p('Vi glæder os til at spille med dig.')
         . mail_signoff(false);
 
-    return ['Vi har modtaget din forespørgsel', mail_shell('da', mail_card($body))];
+    return ['Vi har modtaget din forespørgsel', mail_shell('da', mail_card($body)), $inline];
 }
 
 function newsletterReply(string $name, string $language): array

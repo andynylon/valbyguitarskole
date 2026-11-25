@@ -2,12 +2,12 @@
   "updated": "2026-11-19T12:00:00Z",
   "meta": {
     "title": {
-      "da": "Valby Guitarskole — Find din lyd",
-      "en": "Valby Guitar School — Find your sound"
+      "da": "Valby Guitarskole - Find din lyd",
+      "en": "Valby Guitar School - Find your sound"
     },
     "description": {
-      "da": "En lokalt grundlagt guitarskole i Valby. Nærværende undervisning for børn, unge og voksne — og et hus, hvor man kender hinanden.",
-      "en": "A locally founded guitar school in Valby. Personal lessons for children, young people and adults — and a house where people know each other."
+      "da": "En lokalt grundlagt guitarskole i Valby. Nærværende undervisning for børn, unge og voksne - og et hus, hvor man kender hinanden.",
+      "en": "A locally founded guitar school in Valby. Personal lessons for children, young people and adults - and a house where people know each other."
     }
   },
   "nav": {
@@ -151,8 +151,8 @@
           "en": "Beginners"
         },
         "text": {
-          "da": "Vi tager det helt fra bunden. Du lærer akkorder, rytme og dine første sange — uden unødigt teori-tungt stof.",
-          "en": "We start with the fundamentals. Learn chords, rhythm and your first songs — without unnecessary, theory-heavy material."
+          "da": "Vi tager det helt fra bunden. Du lærer akkorder, rytme og dine første sange - uden unødigt teori-tungt stof.",
+          "en": "We start with the fundamentals. Learn chords, rhythm and your first songs - without unnecessary, theory-heavy material."
         }
       },
       {
@@ -430,8 +430,8 @@
           "en": "Educated at a conservatory."
         },
         "teaching": {
-          "da": "Underviser begyndere, øvede og erfarne — med ro og høje ambitioner.",
-          "en": "Teaches beginners, advanced players and experienced musicians — with calm and high ambition."
+          "da": "Underviser begyndere, øvede og erfarne - med ro og høje ambitioner.",
+          "en": "Teaches beginners, advanced players and experienced musicians - with calm and high ambition."
         },
         "artists": {
           "da": "Kunstnerlisten sættes ind her.",
@@ -537,8 +537,8 @@
           "en": "Attentive"
         },
         "text": {
-          "da": "Enkeltundervisning med fuldt fokus — eller et hold på to.",
-          "en": "One-to-one teaching with complete focus — or a class of two."
+          "da": "Enkeltundervisning med fuldt fokus - eller et hold på to.",
+          "en": "One-to-one teaching with complete focus - or a class of two."
         }
       },
       {
@@ -597,12 +597,12 @@
       "en": "In on what happens."
     },
     "intro": {
-      "da": "Skolen er startet her i kvarteret. Korte mails om koncerter, små aftener og ledige tider — kun når der er noget at fortælle. Du kan altid framelde dig.",
-      "en": "The school started here in the neighbourhood. Short emails about concerts, small evenings and open times — only when there is something to tell. You can unsubscribe at any time."
+      "da": "Skolen er startet her i kvarteret. Korte mails om koncerter, små aftener og ledige tider - kun når der er noget at fortælle. Du kan altid framelde dig.",
+      "en": "The school started here in the neighbourhood. Short emails about concerts, small evenings and open times - only when there is something to tell. You can unsubscribe at any time."
     },
     "checkbox": {
-      "da": "Ja tak — skriv når det lokale hus holder koncerter og aftener.",
-      "en": "Yes — write when the local house has concerts and evenings."
+      "da": "Ja tak, tilmeld mig nyhedsbrevet.",
+      "en": "Yes, sign me up for the newsletter."
     },
     "note": {
       "da": "Vi bruger din e-mail til nyhedsbrevet og ikke til andet.",
@@ -645,8 +645,8 @@
       "en": "the first lesson."
     },
     "text": {
-      "da": "Prøvetimen koster 150 kr. denne uge, halvdelen af prisen. 30 minutter og ingen binding — mærk efter, om skolen er noget for dig.",
-      "en": "The trial lesson is DKK 150 this week, half the price. 30 minutes and no commitment — see whether the school is right for you."
+      "da": "Prøvetimen koster 150 kr. denne uge, halvdelen af prisen. 30 minutter og ingen binding - mærk efter, om skolen er noget for dig.",
+      "en": "The trial lesson is DKK 150 this week, half the price. 30 minutes and no commitment - see whether the school is right for you."
     },
     "price": {
       "da": "150 kr.",
@@ -684,8 +684,8 @@
   "christmas": {
     "until": "2026-12-24",
     "metaTitle": {
-      "da": "Gavekort til jul — Valby Guitarskole",
-      "en": "A Christmas gift card — Valby Guitar School"
+      "da": "Gavekort til jul - Valby Guitarskole",
+      "en": "A Christmas gift card - Valby Guitar School"
     },
     "metaDescription": {
       "da": "Giv guitarundervisning i julegave. Vælg 1, 5, 10 eller 20 lektioner hos Valby Guitarskole. Gavekortet sendes, når betalingen er gået ind.",
@@ -728,8 +728,8 @@
       "en": "on."
     },
     "intro": {
-      "da": "Et gavekort til guitar, elguitar, bas eller ukulele hos Valby Guitarskole. Vælg 1, 5, 10 eller 20 lektioner. Vi sender kortet, når betalingen er gået ind — klar til at give videre.",
-      "en": "A gift card for guitar, electric guitar, bass or ukulele at Valby Guitar School. Choose 1, 5, 10 or 20 lessons. We send the card once payment has arrived — ready to pass on."
+      "da": "Et gavekort til guitar, elguitar, bas eller ukulele hos Valby Guitarskole. Vælg 1, 5, 10 eller 20 lektioner. Vi sender kortet, når betalingen er gået ind - klar til at give videre.",
+      "en": "A gift card for guitar, electric guitar, bass or ukulele at Valby Guitar School. Choose 1, 5, 10 or 20 lessons. We send the card once payment has arrived - ready to pass on."
     },
     "deadline": {
       "da": "Bestil senest juleaften, hvis gaven skal nå frem inden jul.",
@@ -895,22 +895,46 @@
       "en": "lessons."
     },
     "lessonsIntro": {
-      "da": "Kampagnen er til gaven. Herunder kan du tilmelde dig selv eller dit barn til den almindelige undervisning — prøvetime, kortere forløb eller et halvt år.",
-      "en": "The campaign is for the gift. Below, you can sign yourself or your child up for regular lessons — a trial, a shorter course, or six months."
+      "da": "Kampagnen er til gaven. Herunder kan du tilmelde dig selv eller dit barn til den almindelige undervisning - prøvetime, kortere forløb eller et halvt år.",
+      "en": "The campaign is for the gift. Below, you can sign yourself or your child up for regular lessons - a trial, a shorter course, or six months."
     },
     "marqueeLabel": {
       "da": "Gavekort til jul",
       "en": "A Christmas gift card"
     },
     "marquee": [
-      { "da": "Gavekort", "en": "Gift card" },
-      { "da": "Guitar", "en": "Guitar" },
-      { "da": "Elguitar", "en": "Electric guitar" },
-      { "da": "Bas", "en": "Bass" },
-      { "da": "Ukulele", "en": "Ukulele" },
-      { "da": "Børn og voksne", "en": "Children and adults" },
-      { "da": "Valby", "en": "Valby" },
-      { "da": "Til juleaften", "en": "Until Christmas Eve" }
+      {
+        "da": "Gavekort",
+        "en": "Gift card"
+      },
+      {
+        "da": "Guitar",
+        "en": "Guitar"
+      },
+      {
+        "da": "Elguitar",
+        "en": "Electric guitar"
+      },
+      {
+        "da": "Bas",
+        "en": "Bass"
+      },
+      {
+        "da": "Ukulele",
+        "en": "Ukulele"
+      },
+      {
+        "da": "Børn og voksne",
+        "en": "Children and adults"
+      },
+      {
+        "da": "Valby",
+        "en": "Valby"
+      },
+      {
+        "da": "Til juleaften",
+        "en": "Until Christmas Eve"
+      }
     ]
   },
   "cookies": {
@@ -947,7 +971,7 @@
       "en": "Contact"
     },
     "email": "hej@valbyguitarskole.dk",
-    "phone": "+45 26 32 18 40",
+    "phone": "+45 42630966",
     "follow": {
       "da": "Følg med",
       "en": "Follow us"

@@ -298,6 +298,9 @@ if ($signedIn && $databaseConfigured) {
                 <?php if (!empty($enquiry['rent_instrument'])): ?>
                   <div>Leje</div>
                 <?php endif; ?>
+                <?php if ((string) $enquiry['offer'] !== 'Nyhedsbrev'): ?>
+                  <div><?= !empty($enquiry['moms']) ? '30+ · moms' : 'Under 30' ?></div>
+                <?php endif; ?>
                 <?php if (gift_is_offer((string) $enquiry['offer'])): ?>
                   <div class="gift">
                     <div>Reference: <?= htmlspecialchars(gift_reference((int) $enquiry['id']), ENT_QUOTES) ?></div>
