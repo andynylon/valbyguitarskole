@@ -16,6 +16,7 @@ export function BookingModal() {
   const [studentChoice, setStudentChoice] = useState("")
   const [instrumentChoice, setInstrumentChoice] = useState("")
   const [classSize, setClassSize] = useState("1")
+  const [ageChoice, setAgeChoice] = useState("")
 
   const groupNames = content.pricing.group.bookingName
   const groupOffer = selectedOffer === groupNames.da || selectedOffer === groupNames.en
@@ -24,6 +25,7 @@ export function BookingModal() {
     setStudentChoice("")
     setInstrumentChoice("")
     setClassSize(groupOffer ? "2" : "1")
+    setAgeChoice("")
     setError(false)
   }, [selectedOffer, newsletter, groupOffer])
 
@@ -47,7 +49,7 @@ export function BookingModal() {
     setError(false)
 
     const student = String(form.get("student") ?? "")
-    const chosenClass = Number(form.get("classSize") ?? 1)
+    const chosenClass = groupOffer ? Number(form.get("classSize") ?? 2) : 1
 
     try {
       const response = await fetch("/api/booking.php", {
@@ -65,6 +67,7 @@ export function BookingModal() {
           instrument: form.get("instrument"),
           rental: form.get("rental") === "yes",
           newsletter: newsletter || form.get("newsletter") === "yes",
+          moms: !newsletter && ageChoice === "yes",
           recipient: giftCard ? form.get("recipient") : "",
           greeting: giftCard ? form.get("greeting") : "",
           message: form.get("message"),
@@ -188,7 +191,7 @@ export function BookingModal() {
                     {t("Telefon", "Phone")}
                     <input type="tel" name="phone" required placeholder="+45 12 34 56 78" />
                   </label>
-                  {!giftCard && (
+                  {groupOffer ? (
                     <label>
                       {t("Undervisning", "Lessons")}
                       <select
@@ -197,11 +200,12 @@ export function BookingModal() {
                         required
                         onChange={(event) => setClassSize(event.target.value)}
                       >
-                        <option value="1">{t("Enkeltundervisning", "One-to-one")}</option>
                         <option value="2">{t("Hold på to · 45 min.", "Group of two · 45 min.")}</option>
                         <option value="3">{t("Hold på tre · 60 min.", "Group of three · 60 min.")}</option>
                       </select>
                     </label>
+                  ) : (
+                    <input type="hidden" name="classSize" value="1" />
                   )}
                   <label>
                     {giftCard ? t("Forløb", "Course") : t("Hvem skal spille?", "Who will be playing?")}
@@ -229,6 +233,43 @@ export function BookingModal() {
                       )}
                     </select>
                   </label>
+                  <fieldset className="moms-choice">
+                    <legend>
+                      {giftCard
+                        ? t(
+                            "Eleven, der skal bruge lektionerne, er 30 år eller derover",
+                            "The student who will use the lessons is 30 or older",
+                          )
+                        : t("Jeg er 30 år eller derover", "I am 30 or older")}
+                    </legend>
+                    <div className="moms-options">
+                      <label className="newsletter-choice">
+                        <input
+                          type="radio"
+                          name="age30"
+                          value="yes"
+                          required
+                          checked={ageChoice === "yes"}
+                          onChange={() => setAgeChoice("yes")}
+                        />
+                        <span>{t("Ja", "Yes")}</span>
+                      </label>
+                      <label className="newsletter-choice">
+                        <input
+                          type="radio"
+                          name="age30"
+                          value="no"
+                          required
+                          checked={ageChoice === "no"}
+                          onChange={() => setAgeChoice("no")}
+                        />
+                        <span>{t("Nej", "No")}</span>
+                      </label>
+                    </div>
+                    {ageChoice === "yes" && (
+                      <p className="moms-note">{momsNote(giftCard ? studentChoice : (selectedOffer ?? ""), t)}</p>
+                    )}
+                  </fieldset>
                   <label>
                     {tx(content.instruments.label)}
                     <select
@@ -318,4 +359,51 @@ export function BookingModal() {
       </div>
     </div>
   )
+}
+
+function momsNote(offer: string, t: (danish: string, english: string) => string) {
+  const price = momsPriceLine(offer)
+  if (!price) {
+    return t(
+      "25% moms lægges oven i prisen. Der er mulighed for tilskud.",
+      "25% VAT is added to the price. A subsidy is possible.",
+    )
+  }
+
+  return t(
+    `25% moms lægges oven i prisen (${price.da}). Der er mulighed for tilskud.`,
+    `25% VAT is added to the price (${price.en}). A subsidy is possible.`,
+  )
+}
+
+function momsPriceLine(offer: string) {
+  const prices = [
+    {
+      test: (value: string) => /halv pris|half price/i.test(value),
+      da: "150 kr. → 187,50 kr.",
+      en: "DKK 150 → DKK 187.50",
+    },
+    {
+      test: (value: string) => /halvt år|six months|\b20\b/i.test(value),
+      da: "5.750 kr. → 7.187,50 kr.",
+      en: "DKK 5,750 → DKK 7,187.50",
+    },
+    {
+      test: (value: string) => /\b10\b/.test(value),
+      da: "2.850 kr. → 3.562,50 kr.",
+      en: "DKK 2,850 → DKK 3,562.50",
+    },
+    {
+      test: (value: string) => /\b5\b/.test(value),
+      da: "1.500 kr. → 1.875 kr.",
+      en: "DKK 1,500 → DKK 1,875",
+    },
+    {
+      test: (value: string) => /prøvetime|trial|\b1\b/i.test(value),
+      da: "300 kr. → 375 kr.",
+      en: "DKK 300 → DKK 375",
+    },
+  ]
+
+  return prices.find((item) => item.test(offer)) ?? null
 }

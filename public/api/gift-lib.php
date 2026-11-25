@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/enquiries-lib.php';
 require_once __DIR__ . '/mail-lib.php';
+require_once __DIR__ . '/mobilepay.php';
 
 function gift_is_offer(string $offer): bool
 {
@@ -50,7 +51,7 @@ function gift_payment_lines(): array
     return $lines;
 }
 
-function gift_order_reply(string $name, string $amount, string $recipient, string $language, int $id, bool $newsletter = false): array
+function gift_order_reply(string $name, string $amount, string $recipient, string $language, int $id, bool $newsletter = false, bool $moms = false): array
 {
     $reference = $id > 0 ? gift_reference($id) : '';
     $payment = gift_payment_lines();
@@ -99,12 +100,15 @@ function gift_order_reply(string $name, string $amount, string $recipient, strin
     } else {
         $body .= mail_p($fallback);
     }
+    $body .= mobilepay_moms_html($amount, $moms, $english);
+    [$paymentHtml, $inline] = mobilepay_payment_parts($amount, $moms, $english);
+    $body .= $paymentHtml;
     if ($newsletterLine !== '') {
         $body .= mail_p($newsletterLine);
     }
     $body .= mail_p($closing) . mail_signoff($english);
 
-    return [$subject, mail_shell($english ? 'en' : 'da', mail_card($body))];
+    return [$subject, mail_shell($english ? 'en' : 'da', mail_card($body)), $inline];
 }
 
 function gift_by_code(string $code): ?array

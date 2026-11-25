@@ -23,7 +23,7 @@ function mail_config(): ?array
     return $config;
 }
 
-function mail_send(string $to, string $replyTo, string $subject, string $body, bool $autoReply = false, string $contentType = 'text/plain'): void
+function mail_send(string $to, string $replyTo, string $subject, string $body, bool $autoReply = false, string $contentType = 'text/plain', array $inline = []): void
 {
     $config = mail_config();
     if ($config === null) {
@@ -32,7 +32,7 @@ function mail_send(string $to, string $replyTo, string $subject, string $body, b
 
     $socket = smtpConnect($config);
     try {
-        smtpDeliver($socket, (string) $config['from'], $to, $replyTo, $subject, $body, $autoReply, $contentType);
+        smtpDeliver($socket, (string) $config['from'], $to, $replyTo, $subject, $body, $autoReply, $contentType, $inline);
         try {
             smtpCommand($socket, 'QUIT', 221);
         } catch (Throwable $error) {
@@ -86,7 +86,7 @@ function smtpConnect(array $config)
     return $socket;
 }
 
-function smtpDeliver($socket, string $from, string $to, string $replyTo, string $subject, string $body, bool $autoReply, string $contentType = 'text/plain'): void
+function smtpDeliver($socket, string $from, string $to, string $replyTo, string $subject, string $body, bool $autoReply, string $contentType = 'text/plain', array $inline = []): void
 {
     smtpCommand($socket, 'MAIL FROM:<' . $from . '>', 250);
     smtpCommand($socket, 'RCPT TO:<' . $to . '>', 250);
@@ -98,14 +98,38 @@ function smtpDeliver($socket, string $from, string $to, string $replyTo, string 
         'Reply-To: <' . $replyTo . '>',
         'Subject: =?UTF-8?B?' . base64_encode($subject) . '?=',
         'MIME-Version: 1.0',
-        'Content-Type: ' . $contentType . '; charset=UTF-8',
-        'Content-Transfer-Encoding: base64',
     ];
     if ($autoReply) {
         $headers[] = 'Auto-Submitted: auto-replied';
     }
-    $headers[] = '';
-    $headers[] = trim(chunk_split(base64_encode($body), 76, "\r\n"));
+
+    if ($inline === []) {
+        $headers[] = 'Content-Type: ' . $contentType . '; charset=UTF-8';
+        $headers[] = 'Content-Transfer-Encoding: base64';
+        $headers[] = '';
+        $headers[] = trim(chunk_split(base64_encode($body), 76, "\r\n"));
+    } else {
+        $boundary = 'mp_' . bin2hex(random_bytes(8));
+        $headers[] = 'Content-Type: multipart/related; boundary="' . $boundary . '"';
+        $headers[] = '';
+        $headers[] = '--' . $boundary;
+        $headers[] = 'Content-Type: text/html; charset=UTF-8';
+        $headers[] = 'Content-Transfer-Encoding: base64';
+        $headers[] = '';
+        $headers[] = trim(chunk_split(base64_encode($body), 76, "\r\n"));
+        foreach ($inline as $image) {
+            $cid = preg_replace('/[^A-Za-z0-9._-]/', '', (string) ($image['cid'] ?? 'image')) ?? 'image';
+            $data = (string) ($image['data'] ?? '');
+            $headers[] = '--' . $boundary;
+            $headers[] = 'Content-Type: image/png';
+            $headers[] = 'Content-Transfer-Encoding: base64';
+            $headers[] = 'Content-ID: <' . $cid . '>';
+            $headers[] = 'Content-Disposition: inline; filename="' . $cid . '.png"';
+            $headers[] = '';
+            $headers[] = trim(chunk_split(base64_encode($data), 76, "\r\n"));
+        }
+        $headers[] = '--' . $boundary . '--';
+    }
 
     $message = implode("\r\n", $headers);
     $message = preg_replace('/^\./m', '..', $message) ?? $message;
@@ -211,5 +235,5 @@ function mail_signoff(bool $english): string
     return '<p style="margin:28px 0 0;font-family:' . $sans . ';font-size:16px;line-height:1.6;color:#18362f;">' . $closing . '</p>'
         . '<p style="margin:4px 0 0;font-family:' . mail_serif() . ';font-size:22px;line-height:1.3;color:#173f37;">Valby Guitarskole</p>'
         . '<p style="margin:14px 0 0;' . $contact . '"><a href="mailto:hej@valbyguitarskole.dk" style="color:#173f37;text-decoration:underline;">hej@valbyguitarskole.dk</a></p>'
-        . '<p style="margin:0;' . $contact . '"><a href="tel:+4526321840" style="color:#173f37;text-decoration:none;">+45&nbsp;26&nbsp;32&nbsp;18&nbsp;40</a></p>';
+        . '<p style="margin:0;' . $contact . '"><a href="tel:+4542630966" style="color:#173f37;text-decoration:none;">+45&nbsp;26&nbsp;32&nbsp;18&nbsp;40</a></p>';
 }

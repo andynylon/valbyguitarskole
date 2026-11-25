@@ -137,6 +137,10 @@ function enquiries_save(array $enquiry): int
         $columns[] = 'message';
         $values['message'] = (string) ($enquiry['message'] ?? '');
     }
+    if (enquiries_ensure_column($pdo, 'moms', 'TINYINT(1) NOT NULL DEFAULT 0')) {
+        $columns[] = 'moms';
+        $values['moms'] = !empty($enquiry['moms']) ? 1 : 0;
+    }
     $placeholders = array_map(static fn (string $column): string => ':' . $column, $columns);
     $statement = $pdo->prepare(
         'INSERT INTO enquiries (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $placeholders) . ')'
@@ -164,6 +168,9 @@ function enquiries_list(?string $status, bool $newsletterOnly = false): array
     $message = enquiries_ensure_column($pdo, 'message', "VARCHAR(1000) NOT NULL DEFAULT ''")
         ? 'e.message'
         : "'' AS message";
+    $moms = enquiries_ensure_column($pdo, 'moms', 'TINYINT(1) NOT NULL DEFAULT 0')
+        ? 'e.moms'
+        : '0 AS moms';
     $where = [];
     $params = [];
     if ($status !== null && in_array($status, enquiries_statuses(), true)) {
@@ -175,7 +182,7 @@ function enquiries_list(?string $status, bool $newsletterOnly = false): array
     }
 
     $sql = 'SELECT e.id, e.created_at, e.offer, e.name, e.email, e.phone, e.student, e.language, '
-        . $newsletter . ', ' . $instrument . ', ' . $rental . ', ' . $message . ', e.recipient, e.greeting, e.status, g.code AS gift_code, g.status AS gift_status
+        . $newsletter . ', ' . $instrument . ', ' . $rental . ', ' . $message . ', ' . $moms . ', e.recipient, e.greeting, e.status, g.code AS gift_code, g.status AS gift_status
          FROM enquiries e
          LEFT JOIN gift_cards g ON g.enquiry_id = e.id';
     if ($where !== []) {

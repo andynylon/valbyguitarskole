@@ -1,0 +1,30 @@
+---
+description: Never use an em dash in user-facing site text
+globs: src/data/content.json,private/content.json,public/api/default-content.json,src/**/*.tsx,public/**/*.php,index.html
+alwaysApply: false
+---
+
+# No em dash in site text
+
+In user-facing text content for this site, never use the em dash "—" (U+2014). Use a hyphen "-" instead.
+
+Apply this to content JSON and visible UI copy:
+
+- `src/data/content.json`
+- `private/content.json`
+- `public/api/default-content.json`
+- Visible strings in components, `index.html`, and public PHP templates
+
+Leave code comments, CSS, and logic unchanged. Do not change en dashes or hyphens that are already "-".
+
+## Examples
+
+```text
+Bad:  Ja tak — tilmeld mig nyhedsbrevet.
+Good: Ja tak, tilmeld mig nyhedsbrevet.
+
+Bad:  Valby Guitarskole — Find din lyd
+Good: Valby Guitarskole - Find din lyd
+```
+
+A space on each side of the hyphen is fine when the phrase had spaces around the dash.

@@ -38,6 +38,7 @@
     .form-error,
     .form-note,
     .newsletter-choice,
+    .moms-choice,
     .span-2 {
       grid-column: 1 / -1;
     }
@@ -95,7 +96,7 @@
     width: 100%;
     border: 1px solid rgb(24 54 47 / 25%);
     border-radius: 0;
-    background: $white;
+    background-color: $white;
     padding: 14px;
     color: $ink;
     outline: none;
@@ -106,6 +107,27 @@
     &:focus {
       border-color: $coral-deep;
       box-shadow: 0 0 0 1px $coral-deep;
+    }
+  }
+
+  select {
+    // Safari otherwise paints its own grey control and arrow on top of the field.
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    color-scheme: light;
+    padding-right: 42px;
+    background-color: $white;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%2318362f' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 12px 8px;
+
+    // iOS zooms the page when a focused control is under 16px.
+    @supports (-webkit-touch-callout: none) {
+      font-size: 16px;
+      padding-top: 12px;
+      padding-bottom: 12px;
     }
   }
 
@@ -155,6 +177,36 @@
   font: 12px/1.5 $font-sans;
   text-transform: none;
   letter-spacing: 0;
+}
+
+.moms-choice {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+
+  legend {
+    margin: 0 0 8px;
+    padding: 0;
+    color: $ink;
+    font: 500 14px/1.45 $font-sans;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .moms-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+  }
+
+  .moms-note {
+    margin: 8px 0 0;
+    color: $muted-point;
+    font: 13px/1.5 $font-sans;
+    text-transform: none;
+    letter-spacing: 0;
+  }
 }
 
 .modal-intro {
