@@ -116,7 +116,7 @@ function editor_label(string $key): string
         'bookingName' => 'Navn i booking',
         'dismiss' => 'Afvis-knap',
         'close' => 'Luk-knap',
-        'people' => 'Personer',
+        'people' => 'Undervisere',
         'educationLabel' => 'Overskrift, uddannelse',
         'teachingLabel' => 'Overskrift, undervisning',
         'liveLabel' => 'Overskrift, på scenen',
@@ -259,21 +259,83 @@ function editor_string_field(string $path, string $key, string $value): string
         . '</label>';
 }
 
+function editor_is_repeatable(string $path): bool
+{
+    return $path === 'teachers.people';
+}
+
+function editor_blank_item(array $sample): array
+{
+    $blank = [];
+    foreach ($sample as $key => $value) {
+        if (!is_string($key)) {
+            continue;
+        }
+        if (is_string($value)) {
+            $blank[$key] = '';
+        } elseif (editor_is_localized($value)) {
+            $blank[$key] = ['da' => '', 'en' => ''];
+        }
+    }
+
+    return $blank;
+}
+
+function editor_repeatable_sample(array $items, string $path): ?array
+{
+    foreach ($items as $item) {
+        if (is_array($item) && !array_is_list($item)) {
+            return $item;
+        }
+    }
+
+    $sample = content_repeatable_sample($path);
+
+    return is_array($sample) ? $sample : null;
+}
+
+function editor_render_card(mixed $item, string $childPath, string $key, string $title, bool $repeatable): string
+{
+    $remove = $repeatable
+        ? '<button type="button" class="remove-item" data-remove>Fjern</button>'
+        : '';
+    $html = '<li><details class="card"><summary><span>' . editor_escape($title) . '</span>'
+        . $remove . '<i></i></summary><article>';
+    if (editor_is_localized($item)) {
+        $html .= editor_fields_block(editor_localized_field($childPath, $key, $item, false), true);
+    } elseif (is_array($item)) {
+        $html .= editor_render_object($item, $childPath);
+    }
+    $html .= '</article></details></li>';
+
+    return $html;
+}
+
 function editor_render_list(array $items, string $path, string $key): string
 {
-    $html = '<section class="group"><h3>' . editor_escape(editor_label($key)) . '</h3><ol class="cards">';
+    $repeatable = editor_is_repeatable($path);
+    $html = '<section class="group"' . ($repeatable ? ' data-repeatable' : '') . '>'
+        . '<h3>' . editor_escape(editor_label($key)) . '</h3>';
+    if ($repeatable) {
+        $html .= '<p class="hint">Tilføj og fjern undervisere her. Et kort uden navn gemmes, men vises ikke på siden.</p>'
+            . '<input type="hidden" name="' . editor_input_name($path . '._present') . '" value="1">';
+    }
+    $html .= '<ol class="cards">';
     foreach ($items as $index => $item) {
         $title = editor_card_title($item, (int) $index, $key);
-        $childPath = $path . '.' . $index;
-        $html .= '<li><details class="card"><summary><span>' . editor_escape($title) . '</span><i></i></summary><article>';
-        if (editor_is_localized($item)) {
-            $html .= editor_fields_block(editor_localized_field($childPath, $key, $item, false), true);
-        } elseif (is_array($item)) {
-            $html .= editor_render_object($item, $childPath);
-        }
-        $html .= '</article></details></li>';
+        $html .= editor_render_card($item, $path . '.' . $index, $key, $title, $repeatable);
     }
-    $html .= '</ol></section>';
+    $html .= '</ol>';
+    if ($repeatable) {
+        $sample = editor_repeatable_sample($items, $path);
+        if ($sample !== null) {
+            $html .= '<template>'
+                . editor_render_card(editor_blank_item($sample), $path . '.__INDEX__', $key, 'Ny underviser', true)
+                . '</template>';
+            $html .= '<button type="button" class="add-item" data-add>Tilføj underviser</button>';
+        }
+    }
+    $html .= '</section>';
 
     return $html;
 }
@@ -411,6 +473,10 @@ function editor_toc(array $content): string
     .card > summary { padding: 12px 14px; font-weight: 650; }
     .card > summary span { margin-right: auto; }
     .card article { padding: 4px 14px 8px; }
+    .hint { margin: -2px 0 12px; color: #18362fa6; font-size: 14px; }
+    .add-item, .remove-item { background: transparent; color: #173f37; border: 1px solid #18362f33; min-height: 36px; padding: 0 12px; }
+    .remove-item { min-height: 32px; padding: 0 10px; font-size: 13px; }
+    .add-item { margin: 4px 0 8px; }
     .savebar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 18px; background: #173f37; color: #f5eedd; }
     .savebar p { margin: 0; font-size: 14px; }
     .savebar button { background: #f3ecdf; color: #173f37; }
@@ -478,6 +544,41 @@ function editor_toc(array $content): string
           if (!section) return
           section.open = true
           section.scrollIntoView({ behavior: "smooth", block: "start" })
+        })
+      })
+      document.querySelectorAll("[data-repeatable]").forEach((group) => {
+        const list = group.querySelector("ol.cards")
+        const template = group.querySelector("template")
+        const nextIndex = () => {
+          let max = -1
+          list?.querySelectorAll("[name]").forEach((field) => {
+            const match = field.name.match(/\[people\]\[(\d+)\]/)
+            if (match) max = Math.max(max, Number(match[1]))
+          })
+          return max + 1
+        }
+        group.querySelector("[data-add]")?.addEventListener("click", () => {
+          if (!list || !template || list.querySelectorAll(":scope > li").length >= 24) return
+          list.insertAdjacentHTML("beforeend", template.innerHTML.replaceAll("__INDEX__", String(nextIndex())))
+          const card = list.lastElementChild?.querySelector("details")
+          const name = list.lastElementChild?.querySelector('input[name$="[name]"]')
+          if (card) card.open = true
+          window.setTimeout(() => name?.focus(), 0)
+        })
+        list?.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-remove]")
+          if (!button || !list.contains(button)) return
+          event.preventDefault()
+          event.stopPropagation()
+          if (!window.confirm("Fjern denne underviser fra listen? Husk at gemme bagefter.")) return
+          button.closest("li")?.remove()
+        })
+        list?.addEventListener("input", (event) => {
+          const field = event.target
+          if (!(field instanceof HTMLInputElement) || !field.name.endsWith("[name]")) return
+          const title = field.closest("details")?.querySelector("summary span")
+          const name = field.value.trim()
+          if (title && name !== "") title.textContent = name
         })
       })
     </script>

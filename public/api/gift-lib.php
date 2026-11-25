@@ -196,21 +196,23 @@ function gift_send(array $card): void
         . '<p style="margin:16px 0 0;font-family:' . $serif . ';font-size:22px;line-height:1.35;color:#18362f;">' . mail_esc($amount) . '</p>'
         . '<p style="margin:10px 0 0;font-family:' . $sans . ';font-size:15px;line-height:1.5;color:#18362f;">' . mail_esc($for) . ' ' . mail_esc($recipient) . '</p>'
         . mail_lines($greeting, 'margin:14px 0 0;font-family:' . $serif . ';font-style:italic;font-size:18px;line-height:1.45;color:#18362f;')
-        . '<p style="margin:28px 0 0;padding-top:16px;border-top:1px solid #eadfcd;font-family:' . $sans . ';font-size:14px;line-height:1.4;letter-spacing:0.16em;color:#173f37;">' . mail_esc($code) . '</p>'
+        . '<p style="margin:28px 0 0;padding-top:16px;border-top:1px solid #e3ebe8;font-family:' . $sans . ';font-size:14px;line-height:1.4;letter-spacing:0.16em;color:#173f37;">' . mail_esc($code) . '</p>'
         . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:22px;"><tr>'
-        . '<td bgcolor="#173f37" style="background-color:#173f37;padding:12px 18px;">'
-        . '<a href="' . mail_esc($url) . '" style="font-family:' . $sans . ';font-size:14px;line-height:1.2;color:#fffaf0;text-decoration:none;">' . mail_esc($open) . '</a>'
+        . '<td bgcolor="#173f37" style="background-color:#173f37;padding:14px 20px;">'
+        . '<a href="' . mail_esc($url) . '" style="font-family:' . $sans . ';font-size:14px;line-height:1.2;color:#ffffff;text-decoration:none;">' . mail_esc($open) . '</a>'
         . '</td></tr></table>';
+    $voucher = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e3ebe8;">'
+        . '<tr><td style="padding:32px 28px 28px;">' . $cardInner . '</td></tr></table>';
     $html = mail_shell(
         $english ? 'en' : 'da',
-        mail_p($intro, '0 0 20px') . mail_card($cardInner) . mail_signoff($english)
+        mail_p($intro, '0 0 24px') . $voucher . mail_signoff($english)
     );
 
     $mail = mail_config();
     if ($mail === null) {
         throw new RuntimeException('Booking mail is not configured');
     }
-    mail_send((string) $card['buyer_email'], (string) $mail['from'], $subject, $html, false, 'text/html');
+    mail_send((string) $card['buyer_email'], (string) $mail['from'], $subject, $html, false, 'text/html', mail_parts());
 }
 
 function gift_redeem(string $code): void

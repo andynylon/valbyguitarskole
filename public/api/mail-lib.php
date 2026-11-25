@@ -164,42 +164,120 @@ function mail_esc(string $value): string
 
 function mail_sans(): string
 {
-    return "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
+    return "'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
 }
 
 function mail_serif(): string
 {
-    return "Georgia,'Times New Roman',Times,serif";
+    return "'Newsreader',Georgia,'Iowan Old Style','Palatino Linotype',Palatino,serif";
+}
+
+function mail_signature_bytes(): string
+{
+    static $bytes = null;
+    if ($bytes !== null) {
+        return $bytes;
+    }
+    $path = dirname(__DIR__, 2) . '/public/logos/email-signature-600x160.png';
+    $loaded = is_file($path) ? file_get_contents($path) : false;
+    $bytes = is_string($loaded) ? $loaded : '';
+
+    return $bytes;
+}
+
+function mail_circle_png(): string
+{
+    static $png = null;
+    if ($png !== null) {
+        return $png;
+    }
+    $png = '';
+    if (!function_exists('imagecreatetruecolor')) {
+        return $png;
+    }
+    $size = 336;
+    $image = imagecreatetruecolor($size, $size);
+    if ($image === false) {
+        return $png;
+    }
+    imagealphablending($image, false);
+    imagesavealpha($image, true);
+    $clear = imagecolorallocatealpha($image, 0, 0, 0, 127);
+    imagefilledrectangle($image, 0, 0, $size, $size, $clear);
+    $coral = imagecolorallocatealpha($image, 239, 107, 81, 0);
+    imagefilledellipse($image, intdiv($size, 2), intdiv($size, 2), $size - 1, $size - 1, $coral);
+    ob_start();
+    imagepng($image);
+    $png = (string) ob_get_clean();
+
+    return $png;
+}
+
+function mail_parts(array $extra = []): array
+{
+    $parts = [];
+    $signature = mail_signature_bytes();
+    if ($signature !== '') {
+        $parts[] = ['cid' => 'email-signature', 'data' => $signature];
+    }
+    $circle = mail_circle_png();
+    if ($circle !== '') {
+        $parts[] = ['cid' => 'sun-circle', 'data' => $circle];
+    }
+    foreach ($extra as $part) {
+        if (is_array($part)) {
+            $parts[] = $part;
+        }
+    }
+
+    return $parts;
 }
 
 function mail_shell(string $lang, string $inner): string
 {
     $lang = $lang === 'en' ? 'en' : 'da';
     $sans = mail_sans();
+    $circle = mail_circle_png() === ''
+        ? ''
+        : '<tr><td align="right" style="padding:0 0 28px;line-height:0;font-size:0;">'
+            . '<img src="cid:sun-circle" width="168" height="168" alt="" style="display:block;width:168px;height:168px;border:0;">'
+            . '</td></tr>';
+    $signature = mail_signature_bytes() === ''
+        ? ''
+        : '<img src="cid:email-signature" width="280" height="75" alt="Valby Guitarskole" style="display:block;width:280px;max-width:100%;height:auto;border:0;">';
 
     return '<!DOCTYPE html><html lang="' . $lang . '"><head>'
         . '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">'
         . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        . '<link rel="preconnect" href="https://fonts.googleapis.com">'
+        . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+        . '<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">'
         . '<title>Valby Guitarskole</title></head>'
-        . '<body style="margin:0;padding:0;background-color:#f5eedd;-webkit-text-size-adjust:100%;">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5eedd" style="background-color:#f5eedd;margin:0;padding:0;">'
-        . '<tr><td align="center" style="padding:28px 16px;">'
-        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="max-width:480px;margin-left:auto;margin-right:auto;">'
+        . '<body style="margin:0;padding:0;background-color:#ffffff;-webkit-text-size-adjust:100%;">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="background-color:#ffffff;margin:0;padding:0;">'
+        . '<tr><td align="center" style="padding:40px 28px 48px;">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" align="center" style="max-width:640px;margin-left:auto;margin-right:auto;">'
+        . $circle
         . '<tr><td style="font-family:' . $sans . ';color:#18362f;">' . $inner . '</td></tr>'
+        . '<tr><td style="padding-top:36px;border-top:1px solid #e3ebe8;">'
+        . $signature
+        . '<p style="margin:18px 0 0;font-family:' . $sans . ';font-size:14px;line-height:1.6;color:#45645c;">'
+        . '<a href="mailto:hej@valbyguitarskole.dk" style="color:#173f37;text-decoration:none;">hej@valbyguitarskole.dk</a><br>'
+        . '<a href="tel:+4542630966" style="color:#173f37;text-decoration:none;">+45 42 63 09 66</a>'
+        . '</p></td></tr>'
         . '</table></td></tr></table></body></html>';
 }
 
 function mail_card(string $inner): string
 {
-    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#fffaf0" style="background-color:#fffaf0;border:1px solid #173f37;">'
-        . '<tr><td height="4" bgcolor="#da5944" style="height:4px;line-height:4px;font-size:0;background-color:#da5944;">&nbsp;</td></tr>'
-        . '<tr><td style="padding:28px 28px 32px;">' . $inner . '</td></tr>'
+    return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">'
+        . '<tr><td style="padding:0;">' . $inner . '</td></tr>'
         . '</table>';
 }
 
 function mail_brand(): string
 {
-    return '<p style="margin:0 0 18px;font-family:' . mail_sans() . ';font-size:11px;line-height:1.2;letter-spacing:0.18em;text-transform:uppercase;color:#da5944;font-weight:700;">Valby Guitarskole</p>';
+    return '';
 }
 
 function mail_p(string $safeHtml, string $margin = '0 0 16px'): string
@@ -228,12 +306,7 @@ function mail_lines(string $text, string $style): string
 
 function mail_signoff(bool $english): string
 {
-    $sans = mail_sans();
-    $contact = 'font-family:' . $sans . ';font-size:14px;line-height:1.5;color:#18362f;';
     $closing = $english ? 'Kind regards' : 'Venlig hilsen';
 
-    return '<p style="margin:28px 0 0;font-family:' . $sans . ';font-size:16px;line-height:1.6;color:#18362f;">' . $closing . '</p>'
-        . '<p style="margin:4px 0 0;font-family:' . mail_serif() . ';font-size:22px;line-height:1.3;color:#173f37;">Valby Guitarskole</p>'
-        . '<p style="margin:14px 0 0;' . $contact . '"><a href="mailto:hej@valbyguitarskole.dk" style="color:#173f37;text-decoration:underline;">hej@valbyguitarskole.dk</a></p>'
-        . '<p style="margin:0;' . $contact . '"><a href="tel:+4542630966" style="color:#173f37;text-decoration:none;">+45&nbsp;26&nbsp;32&nbsp;18&nbsp;40</a></p>';
+    return '<p style="margin:32px 0 0;font-family:' . mail_sans() . ';font-size:16px;line-height:1.6;color:#18362f;">' . $closing . '</p>';
 }
