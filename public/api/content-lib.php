@@ -211,25 +211,179 @@ function content_fill_missing_keys(array $content, array $defaults): array
 function content_apply_fields(array $content, array $fields): array
 {
     $content = content_merge_strings($content, $fields);
+    $content = content_apply_repeatable_lists($content, $fields);
     $content['updated'] = gmdate('c');
 
     return $content;
 }
 
-function content_merge_strings(array $base, array $incoming): array
+function content_repeatable_paths(): array
+{
+    return ['teachers.people'];
+}
+
+function content_repeatable_sample(string $path): ?array
+{
+    if ($path !== 'teachers.people') {
+        return null;
+    }
+    if (is_file(content_default_path())) {
+        $defaults = json_decode((string) file_get_contents(content_default_path()), true);
+        $people = is_array($defaults) ? ($defaults['teachers']['people'] ?? null) : null;
+        if (is_array($people)) {
+            foreach ($people as $person) {
+                if (is_array($person) && !array_is_list($person)) {
+                    return $person;
+                }
+            }
+        }
+    }
+
+    return [
+        'name' => '',
+        'image' => '',
+        'video' => '',
+        'instrument' => ['da' => '', 'en' => ''],
+        'text' => ['da' => '', 'en' => ''],
+        'education' => ['da' => '', 'en' => ''],
+        'teaching' => ['da' => '', 'en' => ''],
+        'artists' => ['da' => '', 'en' => ''],
+    ];
+}
+
+function content_apply_repeatable_lists(array $content, array $fields): array
+{
+    foreach (content_repeatable_paths() as $path) {
+        $incoming = content_path($fields, $path);
+        if (!is_array($incoming) || !array_key_exists('_present', $incoming)) {
+            continue;
+        }
+
+        $sample = null;
+        $current = content_path($content, $path);
+        if (is_array($current)) {
+            foreach ($current as $item) {
+                if (is_array($item) && !array_is_list($item)) {
+                    $sample = $item;
+                    break;
+                }
+            }
+        }
+        $sample ??= content_repeatable_sample($path);
+        if (!is_array($sample)) {
+            continue;
+        }
+
+        $indexed = [];
+        foreach ($incoming as $key => $item) {
+            if ((!is_int($key) && !(is_string($key) && ctype_digit($key))) || !is_array($item)) {
+                continue;
+            }
+            $indexed[(int) $key] = $item;
+        }
+        ksort($indexed, SORT_NUMERIC);
+
+        $next = [];
+        foreach ($indexed as $item) {
+            if (count($next) >= 24) {
+                break;
+            }
+            $next[] = content_repeatable_item($sample, $item);
+        }
+        $content = content_set_path($content, $path, $next);
+    }
+
+    return $content;
+}
+
+function content_repeatable_item(array $sample, array $posted): array
+{
+    $item = [];
+    foreach ($sample as $key => $value) {
+        if (!is_string($key) || in_array($key, ['updated', 'tone', 'featured'], true)) {
+            continue;
+        }
+        $incoming = $posted[$key] ?? null;
+        if (is_string($value)) {
+            $item[$key] = is_string($incoming) ? content_sanitize_text($incoming) : '';
+            continue;
+        }
+        if (
+            is_array($value)
+            && array_key_exists('da', $value)
+            && array_key_exists('en', $value)
+            && is_string($value['da'])
+            && is_string($value['en'])
+        ) {
+            $danish = is_array($incoming) && is_string($incoming['da'] ?? null) ? $incoming['da'] : '';
+            $english = is_array($incoming) && is_string($incoming['en'] ?? null) ? $incoming['en'] : '';
+            $item[$key] = [
+                'da' => content_sanitize_text($danish),
+                'en' => content_sanitize_text($english),
+            ];
+        }
+    }
+
+    return $item;
+}
+
+function content_path(array $data, string $path): mixed
+{
+    $cursor = $data;
+    foreach (explode('.', $path) as $key) {
+        if (!is_array($cursor) || !array_key_exists($key, $cursor)) {
+            return null;
+        }
+        $cursor = $cursor[$key];
+    }
+
+    return $cursor;
+}
+
+function content_set_path(array $content, string $path, mixed $value): array
+{
+    $keys = explode('.', $path);
+    $last = array_pop($keys);
+    if ($last === null) {
+        return $content;
+    }
+
+    $cursor = &$content;
+    foreach ($keys as $key) {
+        if (!is_array($cursor) || !array_key_exists($key, $cursor) || !is_array($cursor[$key])) {
+            return $content;
+        }
+        $cursor = &$cursor[$key];
+    }
+    $cursor[$last] = $value;
+
+    return $content;
+}
+
+function content_sanitize_text(string $value): string
+{
+    $clean = trim(str_replace(["\r", "\n"], ' ', $value));
+    if (mb_strlen($clean) > 2000) {
+        $clean = mb_substr($clean, 0, 2000);
+    }
+
+    return $clean;
+}
+
+function content_merge_strings(array $base, array $incoming, string $prefix = ''): array
 {
     foreach ($base as $key => $value) {
         if (in_array($key, ['updated', 'tone', 'featured'], true) || !array_key_exists($key, $incoming)) {
             continue;
         }
+        $path = $prefix === '' ? (string) $key : $prefix . '.' . $key;
+        if (in_array($path, content_repeatable_paths(), true)) {
+            continue;
+        }
         if (is_string($value) && is_string($incoming[$key])) {
-            $clean = trim(str_replace(["\r", "\n"], ' ', $incoming[$key]));
-            if (mb_strlen($clean) > 2000) {
-                $clean = mb_substr($clean, 0, 2000);
-            }
-            $base[$key] = $clean;
+            $base[$key] = content_sanitize_text($incoming[$key]);
         } elseif (is_array($value) && is_array($incoming[$key])) {
-            $base[$key] = content_merge_strings($value, $incoming[$key]);
+            $base[$key] = content_merge_strings($value, $incoming[$key], $path);
         }
     }
 

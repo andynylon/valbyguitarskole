@@ -365,14 +365,14 @@ function momsNote(offer: string, t: (danish: string, english: string) => string)
   const price = momsPriceLine(offer)
   if (!price) {
     return t(
-      "25% moms lægges oven i prisen. Der er mulighed for tilskud.",
-      "25% VAT is added to the price. A subsidy is possible.",
+      "25% moms lægges oven i prisen. Det er fradragsberettiget.",
+      "25% VAT is added to the price. It is tax deductible.",
     )
   }
 
   return t(
-    `25% moms lægges oven i prisen (${price.da}). Der er mulighed for tilskud.`,
-    `25% VAT is added to the price (${price.en}). A subsidy is possible.`,
+    `25% moms lægges oven i prisen (${price.da}). Det er fradragsberettiget.`,
+    `25% VAT is added to the price (${price.en}). It is tax deductible.`,
   )
 }
 

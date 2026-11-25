@@ -13,6 +13,7 @@ export function Teachers() {
   const { t } = useLanguage()
   const { openBooking } = useBooking()
   const teachers = content.teachers
+  const people = teachers.people.filter((person) => person.name.trim() !== "")
   const group = content.pricing.group
   const scrollerRef = useRef<HTMLDivElement>(null)
   const [atStart, setAtStart] = useState(true)
@@ -34,7 +35,7 @@ export function Teachers() {
       scroller.removeEventListener("scroll", update)
       window.removeEventListener("resize", update)
     }
-  }, [teachers.people.length])
+  }, [people.length])
 
   function scrollByCard(direction: -1 | 1) {
     const scroller = scrollerRef.current
@@ -59,33 +60,35 @@ export function Teachers() {
         </h2>
         <p className="teachers-intro">{tx(teachers.intro)}</p>
       </div>
-      <div className="teachers-nav">
-        <button
-          type="button"
-          className="is-prev"
-          aria-label={t("Forrige underviser", "Previous teacher")}
-          onClick={() => scrollByCard(-1)}
-          disabled={atStart}
-        >
-          <Arrow />
-        </button>
-        <button
-          type="button"
-          aria-label={t("Næste underviser", "Next teacher")}
-          onClick={() => scrollByCard(1)}
-          disabled={atEnd}
-        >
-          <Arrow />
-        </button>
-      </div>
+      {people.length > 1 && (
+        <div className="teachers-nav">
+          <button
+            type="button"
+            className="is-prev"
+            aria-label={t("Forrige underviser", "Previous teacher")}
+            onClick={() => scrollByCard(-1)}
+            disabled={atStart}
+          >
+            <Arrow />
+          </button>
+          <button
+            type="button"
+            aria-label={t("Næste underviser", "Next teacher")}
+            onClick={() => scrollByCard(1)}
+            disabled={atEnd}
+          >
+            <Arrow />
+          </button>
+        </div>
+      )}
       <div
         className="teachers-track"
         ref={scrollerRef}
         tabIndex={0}
         aria-label={t("Undervisere", "Teachers")}
       >
-        {teachers.people.map((person, index) => (
-          <article key={person.name}>
+        {people.map((person, index) => (
+          <article key={`${person.name}-${index}`}>
             <TeacherPortrait person={person} index={index} />
             <p className="teacher-instrument">{tx(person.instrument)}</p>
             <h3>{person.name}</h3>

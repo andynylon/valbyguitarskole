@@ -2,7 +2,6 @@ import { useState } from "react"
 import { useBooking } from "@/context/BookingContext"
 import { useText } from "@/context/ContentContext"
 import { useLanguage } from "@/context/LanguageContext"
-import { useChristmasLive } from "@/lib/campaign"
 import { Arrow } from "@/components/icons/Arrow"
 import { Logo } from "@/components/Logo/Logo"
 import "./Header.scss"
@@ -11,7 +10,6 @@ export function Header({ campaign = false }: { campaign?: boolean }) {
   const { language, setLanguage, t } = useLanguage()
   const { content, tx } = useText()
   const { openBooking } = useBooking()
-  const { live } = useChristmasLive(content.christmas.until)
   const [menuOpen, setMenuOpen] = useState(false)
   const english = language === "en"
 
@@ -22,7 +20,6 @@ export function Header({ campaign = false }: { campaign?: boolean }) {
         { href: "/", label: tx(content.christmas.navSchool) },
       ]
     : [
-        ...(live ? [{ href: "/jul", label: tx(content.christmas.navCampaign) }] : []),
         { href: "#undervisning", label: tx(content.nav.lessons) },
         { href: "#priser", label: tx(content.nav.pricing) },
         { href: "#undervisere", label: tx(content.nav.teachers) },

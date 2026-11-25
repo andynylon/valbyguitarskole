@@ -71,7 +71,7 @@ function mobilepay_moms_html(string $offer, bool $moms, bool $english): string
         if ($arrow !== '') {
             $text .= ' (' . $arrow . ')';
         }
-        $text .= $english ? '. A subsidy is possible.' : '. Der er mulighed for tilskud.';
+        $text .= $english ? '. It is tax deductible.' : '. Det er fradragsberettiget.';
     } else {
         $text = $english
             ? 'You told us the student is under 30.'

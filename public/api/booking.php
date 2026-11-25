@@ -97,7 +97,7 @@ if (is_array($config) && isset($config['username'], $config['password'], $config
         $school = (string) $config['to'];
         $socket = smtpConnect($config);
         try {
-            smtpDeliver($socket, $from, $school, $email, $subject, $body, false, 'text/html');
+            smtpDeliver($socket, $from, $school, $email, $subject, $body, false, 'text/html', mail_parts());
             $mailed = true;
             $replyInline = [];
             try {
@@ -108,7 +108,7 @@ if (is_array($config) && isset($config['username'], $config['password'], $config
                 } else {
                     [$replySubject, $replyBody, $replyInline] = autoReply($name, $offer, $language, $newsletter, $moms);
                 }
-                smtpDeliver($socket, $from, $email, $from, $replySubject, $replyBody, true, 'text/html', $replyInline);
+                smtpDeliver($socket, $from, $email, $from, $replySubject, $replyBody, true, 'text/html', mail_parts($replyInline));
             } catch (Throwable $error) {
                 error_log('Booking auto-reply failed: ' . $error->getMessage());
             }
@@ -153,8 +153,8 @@ function enquiryMail(
     bool $moms = false
 ): string {
     $sans = mail_sans();
-    $labelStyle = 'padding:9px 16px 9px 0;border-bottom:1px solid #eadfcd;font-family:' . $sans . ';font-size:12px;line-height:1.4;letter-spacing:0.04em;text-transform:uppercase;color:#da5944;vertical-align:top;';
-    $valueStyle = 'padding:9px 0;border-bottom:1px solid #eadfcd;font-family:' . $sans . ';font-size:15px;line-height:1.45;color:#18362f;vertical-align:top;';
+    $labelStyle = 'padding:10px 18px 10px 0;border-bottom:1px solid #e3ebe8;font-family:' . $sans . ';font-size:12px;line-height:1.4;letter-spacing:0.04em;text-transform:uppercase;color:#45645c;vertical-align:top;';
+    $valueStyle = 'padding:10px 0;border-bottom:1px solid #e3ebe8;font-family:' . $sans . ';font-size:16px;line-height:1.5;color:#18362f;vertical-align:top;';
     $rows = [
         ['Tilbud', mail_esc($offer)],
         ['Navn', mail_esc($name)],
