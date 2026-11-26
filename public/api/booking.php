@@ -183,9 +183,7 @@ function enquiryMail(
         if ($arrow !== '') {
             $momsLabel .= ' · ' . $arrow;
         }
-        $payUrl = mobilepay_url($product, $moms);
         $rows[] = ['30 år eller derover', mail_esc($momsLabel)];
-        $rows[] = ['MobilePay', '<a href="' . mail_esc($payUrl) . '" style="color:#173f37;text-decoration:underline;">' . mail_esc($payUrl) . '</a>'];
     }
     if ($gift) {
         $rows[] = ['Til', mail_esc($recipient)];
@@ -218,30 +216,27 @@ function autoReply(string $name, string $offer, string $language, bool $newslett
     $safeName = mail_esc($name);
     $safeOffer = mail_esc($offer);
     $english = $language === 'en';
-    [$paymentHtml, $inline] = mobilepay_payment_parts($offer, $moms, $english);
     if ($english) {
         $body = mail_brand()
             . mail_p('Hi ' . $safeName . ',')
             . mail_p('Thank you for your message. We have received your enquiry about ' . $safeOffer . ' and will get back to you as soon as we can, within one working day.')
             . mobilepay_moms_html($offer, $moms, true)
-            . $paymentHtml
             . ($newsletter ? mail_p('You are also signed up for the newsletter.') : '')
             . mail_p('We look forward to playing with you.')
             . mail_signoff(true);
 
-        return ['We have received your enquiry', mail_shell('en', mail_card($body)), $inline];
+        return ['We have received your enquiry', mail_shell('en', mail_card($body)), []];
     }
 
     $body = mail_brand()
         . mail_p('Hej ' . $safeName . ',')
         . mail_p('Tak for din besked. Vi har modtaget din forespørgsel om ' . $safeOffer . ' og vender tilbage hurtigst muligt, senest inden for én hverdag.')
         . mobilepay_moms_html($offer, $moms, false)
-        . $paymentHtml
         . ($newsletter ? mail_p('Du er også tilmeldt nyhedsbrevet.') : '')
         . mail_p('Vi glæder os til at spille med dig.')
         . mail_signoff(false);
 
-    return ['Vi har modtaget din forespørgsel', mail_shell('da', mail_card($body)), $inline];
+    return ['Vi har modtaget din forespørgsel', mail_shell('da', mail_card($body)), []];
 }
 
 function newsletterReply(string $name, string $language): array
