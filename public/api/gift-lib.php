@@ -101,14 +101,12 @@ function gift_order_reply(string $name, string $amount, string $recipient, strin
         $body .= mail_p($fallback);
     }
     $body .= mobilepay_moms_html($amount, $moms, $english);
-    [$paymentHtml, $inline] = mobilepay_payment_parts($amount, $moms, $english);
-    $body .= $paymentHtml;
     if ($newsletterLine !== '') {
         $body .= mail_p($newsletterLine);
     }
     $body .= mail_p($closing) . mail_signoff($english);
 
-    return [$subject, mail_shell($english ? 'en' : 'da', mail_card($body)), $inline];
+    return [$subject, mail_shell($english ? 'en' : 'da', mail_card($body)), []];
 }
 
 function gift_by_code(string $code): ?array
