@@ -414,78 +414,103 @@
     },
     "people": [
       {
-        "name": "Underviser 1",
-        "image": "",
+        "name": "David Klinke Jørgensen",
+        "image": "/teachers/david-klinke-jorgensen.jpg",
+        "video": "",
+        "instrument": {
+          "da": "Elguitar, akustisk guitar, lapsteel, Pedal steel",
+          "en": "Electric guitar, acoustic guitar, lapsteel, Pedal steel"
+        },
+        "text": {
+          "da": "David brænder for guitaren og for at hjælpe elever med at udvikle deres musikalitet, teknik og spilleglæde. Undervisningen tager udgangspunkt i elevens niveau, interesser og ambitioner.",
+          "en": "A short introduction goes here."
+        },
+        "education": {
+          "da": "The Institute of Contemporary Music Performance, London",
+          "en": "The Institute of Contemporary Music Performance, London"
+        },
+        "teaching": {
+          "da": "Individuel undervisning med fokus på musikalitet, teknik og spilleglæde.",
+          "en": "Individual lessons focused on musicality, technique and the joy of playing."
+        },
+        "artists": {
+          "da": "George Ezra, Silas Bjerregård",
+          "en": "The list of artists goes here."
+        }
+      },
+      {
+        "name": "Emil Brun Madsen",
+        "image": "/teachers/emil-brun-madsen.jpg",
+        "video": "",
+        "instrument": {
+          "da": "Elbas, kontrabas, hørelære",
+          "en": "Electric bass, double bass"
+        },
+        "text": {
+          "da": "Bassist, komponist og underviser med over 20 års erfaring. Emil bevæger sig på tværs af genrer og brænder for at gøre musik både sjovt, inspirerende og udviklende.",
+          "en": "Bassist, composer and teacher with over 20 years of experience. Emil explores a wide range of musical styles and is passionate about making music fun, inspiring and rewarding."
+        },
+        "education": {
+          "da": "Carl Nielsen Akademiet. Studier i New York.",
+          "en": "Carl Nielsen Academy. Studies in New York."
+        },
+        "teaching": {
+          "da": "Over 20 års erfaring med bas, guitar, samspil, teori og musikproduktion.",
+          "en": "Over 20 years of experience teaching bass, guitar, ensemble playing, theory and music production."
+        },
+        "artists": {
+          "da": "George Garzone Dynamo Trio, Carl Winther trio, Bo Evers, Gypsy Vendetta m.fl.",
+          "en": "George Garzone Dynamo Trio, Carl Winther trio, Bo Evers, Gypsy Vendetta m.fl."
+        }
+      },
+      {
+        "name": "Anders Ekstrøm Nilou",
+        "image": "/teachers/anders-ekstroem-nilou.jpg",
+        "video": "",
+        "instrument": {
+          "da": "Guitar, Elektrisk guitar",
+          "en": "Guitar, Electric guitar"
+        },
+        "text": {
+          "da": "Guitarist med mange års erfaring fra livescenen og en kærlighed til jazz, improvisation og musikalsk udfoldelse. Anders tager udgangspunkt i den enkelte elev og kombinerer teknik, teori og spilleglæde.",
+          "en": "A guitarist with extensive live experience and a passion for jazz, improvisation and musical expression. Anders tailors his teaching to each student, combining technique, theory and the joy of playing."
+        },
+        "education": {
+          "da": "Rytmisk Musikkonservatorium. Helsingør MGK.",
+          "en": "Rhythmic Music Conservatory, Copenhagen."
+        },
+        "teaching": {
+          "da": "Fra de første akkorder til improvisation, teknik og videreudvikling af den erfarne guitarist. Rytmisk center, Helsingør MGK og Musikskole, Helsingør ungdomsskole, privatelever",
+          "en": "From first chords to improvisation, technique and further development for experienced players. Rytmisk center, Helsingør MGK og Musikskole, Helsingør ungdomsskole, private students"
+        },
+        "artists": {
+          "da": "Gypsy Vendetta, Bo Evers, Cosmic Rabbitholes, Hammer of the Gods, Stefan Grabowski",
+          "en": "Gypsy Vendetta, Bo Evers, Cosmic Rabbitholes, Hammer of the Gods, Stefan Grabowski"
+        }
+      },
+      {
+        "name": "Jason Shooster",
+        "image": "/teachers/jason-shooster.jpg",
         "video": "",
         "instrument": {
           "da": "Guitar",
           "en": "Guitar"
         },
         "text": {
-          "da": "Kort præsentation sættes ind her.",
-          "en": "A short introduction goes here."
+          "da": "Hej! Mit navn er Jason Shooster, og jeg er professionel guitarist med over 25 års erfaring som musiker og knap 10 års erfaring som guitarunderviser. Jeg har en særlig passion for improvisationsmusik med fokus på jazz, swing og den tidlige bebop. Gennem årene har jeg dog også beskæftiget mig indgående med en række andre genrer, herunder funk, rock og soul. For mig er det vigtigste, at guitarundervisningen både er inspirerende, sjov og tilpasset den enkelte elev. Mit mål er at skabe et trygt og motiverende undervisningsmiljø, hvor du kan udvikle dig som guitarist og samtidig bevare glæden ved at spille musik.",
+          "en": "Hi! My name is Jason Shooster, and I am a professional guitarist with more than 25 years of experience as a musician and nearly 10 years as a guitar teacher. I have a particular passion for improvisation, with a focus on jazz, swing and early bebop. Over the years I have also worked in depth with other genres, including funk, rock and soul. What matters most to me is that guitar lessons are inspiring, fun and tailored to each student. My goal is to create a safe and motivating space where you can develop as a guitarist and keep the joy of playing."
         },
         "education": {
-          "da": "Uddannet fra konservatoriet.",
-          "en": "Educated at a conservatory."
+          "da": "Det Kongelige Musikkonservatoriet. University of Florida",
+          "en": "The Royal Danish Academy of Music. University of Florida"
         },
         "teaching": {
-          "da": "Underviser begyndere, øvede og erfarne - med ro og høje ambitioner.",
-          "en": "Teaches beginners, advanced players and experienced musicians - with calm and high ambition."
+          "da": "Knap 10 års erfaring som guitarunderviser. Undervisningen er inspirerende, sjov og tilpasset den enkelte elev.",
+          "en": "Nearly 10 years as a guitar teacher. Lessons are inspiring, fun and tailored to each student."
         },
         "artists": {
-          "da": "Kunstnerlisten sættes ind her.",
-          "en": "The list of artists goes here."
-        }
-      },
-      {
-        "name": "Underviser 2",
-        "image": "",
-        "video": "",
-        "instrument": {
-          "da": "Elguitar",
-          "en": "Electric guitar"
-        },
-        "text": {
-          "da": "Kort præsentation sættes ind her.",
-          "en": "A short introduction goes here."
-        },
-        "education": {
-          "da": "Uddannet fra konservatoriet.",
-          "en": "Educated at a conservatory."
-        },
-        "teaching": {
-          "da": "Mange års undervisning, fra de første akkorder til spillere, der vil videre.",
-          "en": "Many years of teaching, from the first chords to players who want to go further."
-        },
-        "artists": {
-          "da": "Kunstnerlisten sættes ind her.",
-          "en": "The list of artists goes here."
-        }
-      },
-      {
-        "name": "Underviser 3",
-        "image": "",
-        "video": "",
-        "instrument": {
-          "da": "Akustisk guitar",
-          "en": "Acoustic guitar"
-        },
-        "text": {
-          "da": "Kort præsentation sættes ind her.",
-          "en": "A short introduction goes here."
-        },
-        "education": {
-          "da": "Uddannet fra konservatoriet.",
-          "en": "Educated at a conservatory."
-        },
-        "teaching": {
-          "da": "Undervisning med plads til både teknik, musiksmag og personlig klang.",
-          "en": "Teaching with room for technique, musical taste and a personal sound."
-        },
-        "artists": {
-          "da": "Kunstnerlisten sættes ind her.",
-          "en": "The list of artists goes here."
+          "da": "Jacob Fischer Gypsy Trio, A Little Human!, Madame Machine, Mo Hippa Section, Hot Club de Pai, Kraftdyr",
+          "en": "Jacob Fischer Gypsy Trio, A Little Human!, Madame Machine, Mo Hippa Section, Hot Club de Pai, Kraftdyr"
         }
       }
     ]
